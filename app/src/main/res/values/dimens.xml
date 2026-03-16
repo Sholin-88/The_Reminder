@@ -1,0 +1,72 @@
+<resources>
+
+    <dimen name="double_margin">32dp</dimen>
+    <dimen name="triple_margin">64dp</dimen>
+    <dimen name="extra_margin">24dp</dimen>
+    <dimen name="activity_margin">16dp</dimen>
+    <dimen name="element_spacing">8dp</dimen>
+    <dimen name="zero_dp">0dp</dimen>
+    <dimen name="line_spacing">4dp</dimen>
+    <dimen name="line_spacing_negative">-4dp</dimen>
+    <dimen name="select_country_margin_20dp">20dp</dimen>
+
+    <dimen name="user_stat_width_max">70dp</dimen>
+
+    <dimen name="customActionBarHeight">60dp</dimen>
+    <dimen name="settingsBottomSheetRadius">24dp</dimen>
+
+    <dimen name="superstar_list_dp_size">40dp</dimen>
+    <dimen name="premium_badge_size">16dp</dimen>
+    <dimen name="premium_badge_size_12">12dp</dimen>
+    <dimen name="superstar_list_counter_size">24dp</dimen>
+
+    <dimen name="superstar_stat_card_dp_size">60dp</dimen>
+    <dimen name="superstar_stat_card_radius">6dp</dimen>
+
+    <dimen name="message_list_dp_size">44dp</dimen>
+    <dimen name="premium_huddle_dp_radius">12dp</dimen>
+    <dimen name="premium_huddle_dp_border">1dp</dimen>
+    <dimen name="broadcast_list_dp_size">24dp</dimen>
+
+    <dimen name="drawer_header_dp_size">64dp</dimen>
+
+    <dimen name="profile_header_dp_size">70dp</dimen>
+    <dimen name="drawer_header_premium_badge_size">24dp</dimen>
+
+    <dimen name="chat_bubble_radius">12dp</dimen>
+    <dimen name="chat_bubble_media_radius">6dp</dimen>
+    <dimen name="chat_bubble_radius_huddle">6dp</dimen>
+    <dimen name="chat_bubble_radius_huddle_pinned">6dp</dimen>
+    <dimen name="chat_huddle_post_sheet_offset">70dp</dimen>
+    <dimen name="tribe_dp_size">90dp</dimen>
+    <dimen name="id_card_dp_size">100dp</dimen>
+    <dimen name="chat_huddle_dp_size">36dp</dimen>
+    <dimen name="chat_huddle_reply_dp_size">30dp</dimen>
+    <dimen name="chat_huddle_post_dp_size">44dp</dimen>
+    <dimen name="chat_huddle_post_dp_size_recording">132dp</dimen>
+    <dimen name="chat_huddle_post_dp_badge_size_recording">32dp</dimen>
+    <dimen name="business_horizontal_divider_start_margin">60dp</dimen>
+    <dimen name="business_vertical_divider_start_margin">30dp</dimen>
+
+    <dimen name="business_bottom_sheet_peek_height">500dp</dimen>
+    <dimen name="tribe_content_height">280dp</dimen>
+    <dimen name="sticker_size">80dp</dimen>
+    <dimen name="video_trim_seekbar_corner_radius">4dp</dimen>
+    <dimen name="video_trim_seekbar_overlay_thickness">2dp</dimen>
+
+    <dimen name="flash_comment_sheet_offset">50dp</dimen>
+    <dimen name="podium_challenge_board_border_size">20dp</dimen>
+    <dimen name="podium_challenge_board_border_size_hidden">0dp</dimen>
+    <dimen name="challenge_gift_bar_height">14dp</dimen>
+    <dimen name="challenge_icon_size">42dp</dimen>
+    <dimen name="challenge_gift_supporter_dp_size">32dp</dimen>
+    <dimen name="podium_challenge_list_item_min_height">120dp</dimen>
+
+    <dimen name="postat_tab_min_width">100dp</dimen>
+
+    <dimen name="podium_maidan_challenge_history_width">80dp</dimen>
+    <dimen name="podium_maidan_competitor_stats_width">60dp</dimen>
+
+    <item name="hms_video_view" type="id"/>
+
+</resources>
