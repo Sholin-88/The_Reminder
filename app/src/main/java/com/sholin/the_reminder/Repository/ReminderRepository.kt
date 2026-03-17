@@ -9,12 +9,16 @@ class ReminderRepository(val context: Application) {
     val database = DatabaseProvider.getDatabase(context)
     val dao = database.reminderDao()
 
-    suspend fun getReminderList() = dao.getAllUsers()
+     fun getReminderList() = dao.getAllUsers()
 
 
     suspend fun insertReminder(reminder: Reminder) = dao.insertUser(reminder)
 
     suspend fun deleteReminder(id: Int) = dao.deleteUser(id)
+
+    suspend fun updateSwitchById(id: Int, alarm: Boolean) = dao.updateSwitchById(id, alarm)
+
+
 
 
 }

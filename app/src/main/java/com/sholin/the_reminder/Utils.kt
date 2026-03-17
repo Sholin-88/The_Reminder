@@ -29,6 +29,11 @@ object Utils {
         return formatter.format(instant)
     }
 
+    fun formatEpoch(epochMillis: Long): String {
+        val date = Date(epochMillis)
+        val formatter = SimpleDateFormat("hh:mm a", Locale.getDefault())
+        return formatter.format(date)
+    }
 
 
 }
