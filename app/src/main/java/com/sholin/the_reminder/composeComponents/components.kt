@@ -7,7 +7,9 @@ import android.os.Build
 import android.widget.DatePicker
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -54,6 +56,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.font.FontWeight
@@ -172,7 +175,59 @@ fun DatePickerModalInput(
 }
 
 @Composable
-fun SingleReminderItem(reminder: Reminder,onCheckedChange: (Boolean) -> Unit){
+fun DateTimePicker(
+    onDateTimeSelected: (Long) -> Unit,
+) {
+    val context = LocalContext.current
+    val calendar = Calendar.getInstance()
+
+    var showDatePicker by remember { mutableStateOf(false) }
+    var showTimePicker by remember { mutableStateOf(false) }
+
+    Button(onClick = { showDatePicker = true }) {
+        Text("Pick Date & Time")
+    }
+
+    if (showDatePicker) {
+        DatePickerDialog(
+            context,
+            { _, year, month, dayOfMonth ->
+                calendar.set(Calendar.YEAR, year)
+                calendar.set(Calendar.MONTH, month)
+                calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+                showDatePicker = false
+                showTimePicker = true
+            },
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH)
+        ).show()
+    }
+
+    if (showTimePicker) {
+        TimePickerDialog(
+            context,
+            { _, hourOfDay, minute ->
+                calendar.set(Calendar.HOUR_OF_DAY, hourOfDay)
+                calendar.set(Calendar.MINUTE, minute)
+                calendar.set(Calendar.SECOND, 0)
+                showTimePicker = false
+
+                val triggerAtMillis = calendar.timeInMillis
+                onDateTimeSelected(triggerAtMillis)
+            },
+            calendar.get(Calendar.HOUR_OF_DAY),
+            calendar.get(Calendar.MINUTE),
+            true
+        ).show()
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun SingleReminderItem(reminder: Reminder,
+                       onCheckedChange: (Boolean) -> Unit,
+                       onDeleted: () -> Unit){
 //    val randomColor = remember {
 //        Color(
 //            red = (0..255).random(),
@@ -189,6 +244,11 @@ fun SingleReminderItem(reminder: Reminder,onCheckedChange: (Boolean) -> Unit){
             .background(shape = RoundedCornerShape(10.dp), color = color)
             .fillMaxWidth()
             .padding(dimensionResource(R.dimen.element_spacing))
+            .combinedClickable(
+                onClick = { },
+                onLongClick = { onDeleted() }
+            )
+
     ) {
         Text(
             modifier = Modifier.fillMaxWidth(),
@@ -214,18 +274,15 @@ fun SingleReminderItem(reminder: Reminder,onCheckedChange: (Boolean) -> Unit){
             thickness = 10.dp,
             color = color
         )
-        Text(
-            modifier = Modifier.fillMaxWidth(),
-            text = reminder.date,
-            color = colorResource(R.color.black),
-            style = ComposeTypography.defaultType.bodyLarge.copy(fontSize = 22.sp, fontWeight = FontWeight.Bold)
-        )
-        Text(
-            modifier = Modifier.fillMaxWidth(),
-            text = reminder.time,
-            color = colorResource(R.color.black),
-            style = ComposeTypography.defaultType.bodyLarge.copy(fontSize = 24.sp, fontWeight = FontWeight.Bold)
-        )
+        reminder.date.let {
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = Utils.formatMillis(it.toLong()),
+                color = colorResource(R.color.black),
+                style = ComposeTypography.defaultType.bodyLarge.copy(fontSize = 22.sp, fontWeight = FontWeight.Bold)
+            )
+        }
+
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -261,7 +318,7 @@ fun SingleReminderItem(reminder: Reminder,onCheckedChange: (Boolean) -> Unit){
 @Preview()
 @Composable
 fun SingleItemPreview(){
-    SingleReminderItem(Reminder(header = "Test", description = "Test am on here on the other hand ", date = "15/12/2026", time = "02:00"), onCheckedChange = {true})
+    SingleReminderItem(Reminder(header = "Test", description = "Test am on here on the other hand ", date = "15/12/2026"), onCheckedChange = {true}, onDeleted = {})
 }
 
 @Preview(showBackground = true)

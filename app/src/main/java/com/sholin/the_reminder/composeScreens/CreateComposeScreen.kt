@@ -2,6 +2,8 @@
 
 package com.sholin.the_reminder.composeScreens
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -48,11 +50,13 @@ import androidx.compose.ui.unit.dp
 import com.sholin.the_reminder.CommonViewModel
 import com.sholin.the_reminder.R
 import com.sholin.the_reminder.Utils
+import com.sholin.the_reminder.Utils.DateTimePicker
 import com.sholin.the_reminder.composeComponents.DatePickerModalInput
 import com.sholin.the_reminder.ui.theme.ComposeTypography
 import com.sholin.the_reminder.ui.theme.Typography
 import java.util.Calendar
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CreateReminder(viewModel: CommonViewModel, innerPaddingValues: PaddingValues) {
     val context = LocalContext.current
@@ -199,94 +203,30 @@ fun CreateReminder(viewModel: CommonViewModel, innerPaddingValues: PaddingValues
                     tint = colorResource(R.color.teal_200),
                 )
             }
-            Text(  modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
-                .align(alignment = Alignment.CenterVertically)
-                .padding(start = dimensionResource(R.dimen.activity_margin)),
-                text = viewModel.selectedDate.text,
-                color = colorResource(R.color.black),
-                style = ComposeTypography.bodyMedium)
 
+           if (viewModel.selectedDateEpoch.text.isNotEmpty()) {
+               Text(
+                   modifier = Modifier
+                       .fillMaxWidth()
+                       .weight(1f)
+                       .align(alignment = Alignment.CenterVertically)
+                       .padding(start = dimensionResource(R.dimen.activity_margin)),
+                   text = Utils.formatMillis(viewModel.selectedDateEpoch.text.toLong()),
+                   color = colorResource(R.color.black),
+                   style = ComposeTypography.bodyMedium
+               )
+           }
         }
 
         if (showPicker) {
-            DatePickerModalInput(
-                onDateSelected = { millis ->
+            DateTimePicker(
+                onDateTimeSelected = { millis ->
                     viewModel.updateSelectedDate(millis)
                     showPicker = false
-                },
-                onDismiss = { showPicker = false }
-            )
-        }
-
-        HorizontalDivider(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(10.dp),
-            thickness = 5.dp,
-            color = colorResource(R.color.white)
-        )
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-
-
-            IconButton(onClick = { showDialog = true }) {
-                Icon(
-                    modifier = Modifier.size(30.dp),
-                    imageVector = Icons.Default.Info,
-                    contentDescription = "Time",
-                    tint = colorResource(R.color.teal_200),
-                )
-            }
-            selectedEpoch?.let {
-                Text(  modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .align(alignment = Alignment.CenterVertically)
-                    .padding(start = dimensionResource(R.dimen.activity_margin)),
-                    text = Utils.formatEpoch(it),
-                    color = colorResource(R.color.black),
-                    style = ComposeTypography.bodyMedium)
-            }
-
-
-        }
-
-        if (showDialog) {
-            val state = rememberTimePickerState(is24Hour = false)
-
-            AlertDialog(
-                onDismissRequest = { showDialog = false },
-                confirmButton = {
-                    TextButton(onClick = {
-                        // Use today’s date + selected hour/minute
-                        val calendar = Calendar.getInstance().apply {
-                            set(Calendar.HOUR_OF_DAY, state.hour)
-                            set(Calendar.MINUTE, state.minute)
-                            set(Calendar.SECOND, 0)
-                            set(Calendar.MILLISECOND, 0)
-                        }
-                        selectedEpoch = calendar.timeInMillis
-                        viewModel.setEpochTime(calendar.timeInMillis)
-                        showDialog = false
-                    }) {
-                        Text("OK")
-                    }
-                },
-                dismissButton = {
-                    TextButton(onClick = { showDialog = false }) {
-                        Text("Cancel")
-                    }
-                },
-                text = {
-                    TimePicker(state = state)
                 }
             )
         }
+
         ReminderList(viewModel)
 
     }

@@ -24,30 +24,29 @@ class CommonViewModel(application: Application) : AndroidViewModel(application) 
 
     var header by mutableStateOf(TextFieldValue())
     var description by mutableStateOf(TextFieldValue())
-    var selectedDate by mutableStateOf(TextFieldValue(""))
+    var selectedDateEpoch by mutableStateOf(TextFieldValue(""))
 
-    var selectedEpochTime by mutableStateOf(TextFieldValue(""))
+
 
 
 
     fun clearFields() {
         header = TextFieldValue("")
         description = TextFieldValue("")
-        selectedDate = TextFieldValue("")
-        selectedEpochTime = TextFieldValue("")
+        selectedDateEpoch = TextFieldValue("")
     }
 
     fun updateSelectedDate(selectedDate: Long?) {
         selectedDate?.let {
-            this.selectedDate = TextFieldValue(formatMillis(it))
+            this.selectedDateEpoch = TextFieldValue(it.toString())
         }
     }
 
 val isCloseVisible: Boolean
-    get() = selectedDate.text.isNotEmpty() && description.text.isNotEmpty() && header.text.isNotEmpty() && selectedEpochTime.text.isNotEmpty()
+    get() = selectedDateEpoch.text.isNotEmpty() && description.text.isNotEmpty() && header.text.isNotEmpty()
 
     val isSaveEnabled: Boolean
-    get() = selectedDate.text.isNotEmpty()  && description.text.isNotEmpty() && header.text.isNotEmpty() && selectedEpochTime.text.isNotEmpty()
+    get() = selectedDateEpoch.text.isNotEmpty()  && description.text.isNotEmpty() && header.text.isNotEmpty()
 
 
 
@@ -55,7 +54,7 @@ val isCloseVisible: Boolean
         viewModelScope.launch {
             reminderRepository.insertReminder(
                 Reminder(
-                    header = header.text, description = description.text, date = selectedDate.text, time = selectedEpochTime.text
+                    header = header.text, description = description.text, date = selectedDateEpoch.text
                 )
             )
             clearFields()
@@ -67,11 +66,6 @@ val isCloseVisible: Boolean
             reminderRepository.deleteReminder(id)
 
         }
-    }
-
-    fun setEpochTime(timeInMillis: Long) {
-        selectedEpochTime = TextFieldValue(Utils.formatEpoch(timeInMillis))
-
     }
 
     fun updateAlarm(reminder: Reminder, it: Boolean) {
