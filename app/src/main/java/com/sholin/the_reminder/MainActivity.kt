@@ -10,11 +10,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Scaffold
-import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
-import com.sholin.the_reminder.composeScreens.CreateReminder
+import com.sholin.the_reminder.composeScreens.MainScreen
 import com.sholin.the_reminder.ui.theme.The_ReminderTheme
 
 class MainActivity : ComponentActivity() {
@@ -22,16 +19,13 @@ class MainActivity : ComponentActivity() {
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
-    ) { isGranted: Boolean ->
-        // Handle permission result if needed
-    }
+    ) { _ -> }
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         
-        // Request notification permission for Android 13+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(
                     this,
@@ -44,9 +38,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             The_ReminderTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    CreateReminder(viewModel, innerPadding)
-                }
+                MainScreen(viewModel)
             }
         }
     }

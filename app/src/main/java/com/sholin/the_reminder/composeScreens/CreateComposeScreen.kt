@@ -5,6 +5,7 @@ package com.sholin.the_reminder.composeScreens
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -14,14 +15,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -29,44 +32,43 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TimePicker
-import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.sholin.the_reminder.CommonViewModel
 import com.sholin.the_reminder.R
 import com.sholin.the_reminder.Utils
-import com.sholin.the_reminder.Utils.DateTimePicker
-import com.sholin.the_reminder.composeComponents.DatePickerModalInput
 import com.sholin.the_reminder.ui.theme.ComposeTypography
 import com.sholin.the_reminder.ui.theme.Typography
-import java.util.Calendar
+import java.time.LocalDate
+import java.time.format.TextStyle
+import java.time.temporal.TemporalAdjusters
+import java.time.DayOfWeek
+import java.util.Locale
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CreateReminder(viewModel: CommonViewModel, innerPaddingValues: PaddingValues) {
-    val context = LocalContext.current
-  val  focusManager = LocalFocusManager.current
-  val  keyboardManager1 = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
+    val keyboardManager1 = LocalSoftwareKeyboardController.current
     var showPicker by remember { mutableStateOf(false) }
-    var showDialog by remember { mutableStateOf(false) }
-    var selectedEpoch by remember { mutableStateOf<Long?>(null) }
 
-
+    val daysOfWeek = remember {
+        val monday = LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+        (0..6).map { monday.plusDays(it.toLong()) }
+    }
 
     Column(
         modifier = Modifier
@@ -91,15 +93,15 @@ fun CreateReminder(viewModel: CommonViewModel, innerPaddingValues: PaddingValues
                 style = ComposeTypography.header
             )
 
-                IconButton(onClick = { viewModel.insertData() },
-                    enabled = viewModel.isSaveEnabled) {
-                    Icon(
-                        modifier = Modifier.size(30.dp),
-                        imageVector = Icons.Default.CheckCircle,
-                        contentDescription = "Add",
-                        tint = colorResource(R.color.black),
-                    )
-                }
+            IconButton(onClick = { viewModel.insertData() },
+                enabled = viewModel.isSaveEnabled) {
+                Icon(
+                    modifier = Modifier.size(30.dp),
+                    imageVector = Icons.Default.CheckCircle,
+                    contentDescription = "Add",
+                    tint = colorResource(R.color.black),
+                )
+            }
             if (viewModel.isCloseVisible) {
                 IconButton(onClick = { viewModel.clearFields() }) {
                     Icon(
@@ -110,16 +112,51 @@ fun CreateReminder(viewModel: CommonViewModel, innerPaddingValues: PaddingValues
                     )
                 }
             }
-
         }
 
         HorizontalDivider(
             modifier = Modifier
-                .height(30.dp)
-                .align(alignment = Alignment.CenterHorizontally),
-            thickness = 1.dp,
-            color = colorResource(R.color.white)
+                .height(20.dp),
+            thickness = 0.dp,
+            color = Color.Transparent
         )
+
+        // Day Selection Row - Modified to show only day names from Monday to Sunday
+        LazyRow(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 10.dp)
+                .wrapContentHeight(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            items(daysOfWeek) { date ->
+                val dayName = date.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault())
+                val dayId = date.dayOfWeek.value
+                val isSelected = viewModel.selectedDayId == dayId
+
+                Column(
+                    modifier = Modifier
+                        .width(48.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(if (isSelected) colorResource(R.color.purple_200) else Color.LightGray.copy(alpha = 0.3f))
+                        .clickable { 
+                            viewModel.updateSelectedDay(dayId)
+                        }
+                        .padding(vertical = 12.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(text = dayName, fontSize = 14.sp, color = if (isSelected) Color.White else Color.Black)
+                }
+            }
+        }
+
+        HorizontalDivider(
+            modifier = Modifier
+                .height(30.dp),
+            thickness = 0.dp,
+            color = Color.Transparent
+        )
+
         OutlinedTextField(
             modifier = Modifier
                 .fillMaxWidth()
@@ -193,8 +230,6 @@ fun CreateReminder(viewModel: CommonViewModel, innerPaddingValues: PaddingValues
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-
-
             IconButton(onClick = { showPicker = true }) {
                 Icon(
                     modifier = Modifier.size(30.dp),
@@ -204,30 +239,29 @@ fun CreateReminder(viewModel: CommonViewModel, innerPaddingValues: PaddingValues
                 )
             }
 
-           if (viewModel.selectedDateEpoch.text.isNotEmpty()) {
-               Text(
-                   modifier = Modifier
-                       .fillMaxWidth()
-                       .weight(1f)
-                       .align(alignment = Alignment.CenterVertically)
-                       .padding(start = dimensionResource(R.dimen.activity_margin)),
-                   text = Utils.formatMillis(viewModel.selectedDateEpoch.text.toLong()),
-                   color = colorResource(R.color.black),
-                   style = ComposeTypography.bodyMedium
-               )
-           }
+            if (viewModel.selectedDateEpoch.text.isNotEmpty()) {
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .align(alignment = Alignment.CenterVertically)
+                        .padding(start = dimensionResource(R.dimen.activity_margin)),
+                    text = Utils.formatMillis(viewModel.selectedDateEpoch.text.toLong()),
+                    color = colorResource(R.color.black),
+                    style = ComposeTypography.bodyMedium
+                )
+            }
         }
 
         if (showPicker) {
-            DateTimePicker(
+            Utils.DateTimePicker(
                 onDateTimeSelected = { millis ->
-                    viewModel.updateSelectedDate(millis)
+                    if (millis > 0) {
+                        viewModel.updateSelectedDate(millis)
+                    }
                     showPicker = false
                 }
             )
         }
-
-        ReminderList(viewModel)
-
     }
 }
