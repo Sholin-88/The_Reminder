@@ -25,6 +25,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -32,6 +33,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TimePicker
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -63,7 +66,8 @@ import java.util.Locale
 fun CreateReminder(viewModel: CommonViewModel, innerPaddingValues: PaddingValues) {
     val focusManager = LocalFocusManager.current
     val keyboardManager1 = LocalSoftwareKeyboardController.current
-    var showPicker by remember { mutableStateOf(false) }
+    var showDatePicker by remember { mutableStateOf(false) }
+    var showWeekTimePicker by remember { mutableStateOf(false) }
 
     val daysOfWeek = remember {
         val monday = LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
@@ -114,138 +118,42 @@ fun CreateReminder(viewModel: CommonViewModel, innerPaddingValues: PaddingValues
             }
         }
 
-        HorizontalDivider(
-            modifier = Modifier
-                .height(20.dp),
-            thickness = 0.dp,
-            color = Color.Transparent
-        )
+        HorizontalDivider(modifier = Modifier.height(20.dp), thickness = 0.dp, color = Color.Transparent)
 
-        // Day Selection Row - Modified to show only day names from Monday to Sunday
-        LazyRow(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 10.dp)
-                .wrapContentHeight(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            items(daysOfWeek) { date ->
-                val dayName = date.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault())
-                val dayId = date.dayOfWeek.value
-                val isSelected = viewModel.selectedDayId == dayId
-
-                Column(
-                    modifier = Modifier
-                        .width(48.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(if (isSelected) colorResource(R.color.purple_200) else Color.LightGray.copy(alpha = 0.3f))
-                        .clickable { 
-                            viewModel.updateSelectedDay(dayId)
-                        }
-                        .padding(vertical = 12.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(text = dayName, fontSize = 14.sp, color = if (isSelected) Color.White else Color.Black)
-                }
-            }
-        }
-
-        HorizontalDivider(
-            modifier = Modifier
-                .height(30.dp),
-            thickness = 0.dp,
-            color = Color.Transparent
-        )
 
         OutlinedTextField(
-            modifier = Modifier
-                .fillMaxWidth()
-                .size(250.dp, 70.dp)
-                .padding(start = 10.dp, end = 10.dp)
-                .background(
-                    color = colorResource(R.color.white),
-                    shape = RoundedCornerShape(12.dp)
-                ),
+            modifier = Modifier.fillMaxWidth().height(70.dp).padding(horizontal = 10.dp),
             value = viewModel.header,
-            onValueChange = {
-                viewModel.header = it
-            },
+            onValueChange = { viewModel.header = it },
             shape = RoundedCornerShape(12.dp),
-            keyboardActions = KeyboardActions(
-                onDone = {
-                    keyboardManager1?.hide()
-                    focusManager.clearFocus()
-                },
-            ),
-            colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.Black,
-                unfocusedTextColor = Color.Black),
+            colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.Black, unfocusedTextColor = Color.Black),
             textStyle = Typography.labelMedium,
             singleLine = true,
             label = { Text(text = "Add Header") }
         )
 
-        HorizontalDivider(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(10.dp),
-            thickness = 10.dp,
-            color = colorResource(R.color.white)
-        )
+        HorizontalDivider(modifier = Modifier.height(10.dp), thickness = 0.dp, color = Color.Transparent)
 
         OutlinedTextField(
-            modifier = Modifier
-                .fillMaxWidth()
-                .size(250.dp, 100.dp)
-                .padding(start = 10.dp, end = 10.dp)
-                .background(
-                    color = colorResource(R.color.white),
-                    shape = RoundedCornerShape(12.dp)
-                ),
+            modifier = Modifier.fillMaxWidth().height(100.dp).padding(horizontal = 10.dp),
             value = viewModel.description,
-            onValueChange = {
-                viewModel.description = it
-            },
+            onValueChange = { viewModel.description = it },
             shape = RoundedCornerShape(12.dp),
-            keyboardActions = KeyboardActions(
-                onDone = {
-                    keyboardManager1?.hide()
-                    focusManager.clearFocus()
-                },
-            ),
             colors = OutlinedTextFieldDefaults.colors(Color.Black, Color.Black),
             textStyle = Typography.labelMedium,
-            singleLine = false,
             label = { Text(text = "Add Description") },
-            maxLines = 4)
-
-        HorizontalDivider(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(10.dp),
-            thickness = 5.dp,
-            color = colorResource(R.color.white)
+            maxLines = 4
         )
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(onClick = { showPicker = true }) {
-                Icon(
-                    modifier = Modifier.size(30.dp),
-                    imageVector = Icons.Default.DateRange,
-                    contentDescription = "Date",
-                    tint = colorResource(R.color.teal_200),
-                )
+
+        HorizontalDivider(modifier = Modifier.height(10.dp), thickness = 0.dp, color = Color.Transparent)
+
+        Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+            IconButton(onClick = { showDatePicker = true }) {
+                Icon(imageVector = Icons.Default.DateRange, contentDescription = "Specific Date", tint = colorResource(R.color.teal_200))
             }
 
             if (viewModel.selectedDateEpoch.text.isNotEmpty()) {
                 Text(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f)
-                        .align(alignment = Alignment.CenterVertically)
-                        .padding(start = dimensionResource(R.dimen.activity_margin)),
                     text = Utils.formatMillis(viewModel.selectedDateEpoch.text.toLong()),
                     color = colorResource(R.color.black),
                     style = ComposeTypography.bodyMedium
@@ -253,15 +161,72 @@ fun CreateReminder(viewModel: CommonViewModel, innerPaddingValues: PaddingValues
             }
         }
 
-        if (showPicker) {
-            Utils.DateTimePicker(
-                onDateTimeSelected = { millis ->
-                    if (millis > 0) {
-                        viewModel.updateSelectedDate(millis)
+        // Dialogs
+        if (showWeekTimePicker) {
+            android.app.TimePickerDialog(
+                androidx.compose.ui.platform.LocalContext.current,
+                { _, hourOfDay, minute ->
+                    viewModel.updateSelectedDaysTime(hourOfDay, minute)
+                    showWeekTimePicker = false
+                },
+                12, 0, false
+            ).show()
+        }
+
+        if (showDatePicker) {
+            Utils.DateTimePicker(onDateTimeSelected = { millis ->
+                if (millis > 0) viewModel.updateSelectedDate(millis)
+                showDatePicker = false
+            })
+        }
+
+
+
+        // Day Selection Row
+        Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+            LazyRow(
+                modifier = Modifier.weight(1f).wrapContentHeight(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                items(daysOfWeek) { date ->
+                    val dayName = date.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault())
+                    val dayId = date.dayOfWeek.value
+                    val isSelected = viewModel.selectedDayIds.contains(dayId)
+
+                    Column(
+                        modifier = Modifier
+                            .width(42.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(if (isSelected) colorResource(R.color.purple_200) else Color.LightGray.copy(alpha = 0.3f))
+                            .clickable { viewModel.toggleDaySelection(dayId) }
+                            .padding(vertical = 10.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(text = dayName, fontSize = 12.sp, color = if (isSelected) Color.White else Color.Black)
                     }
-                    showPicker = false
                 }
+            }
+
+            // Dedicated Time Picker for Week Days
+            IconButton(onClick = { showWeekTimePicker = true }) {
+                Icon(
+                    imageVector = Icons.Default.Notifications,
+                    contentDescription = "Set Time for Days",
+                    tint = if (viewModel.selectedDaysTime != null) colorResource(R.color.purple_200) else Color.Gray
+                )
+            }
+        }
+
+        if (viewModel.selectedDaysTime != null && viewModel.selectedDayIds.isNotEmpty()) {
+            Text(
+                text = "Every selected day at ${viewModel.selectedDaysTime}",
+                style = Typography.labelSmall,
+                color = colorResource(R.color.purple_500),
+                modifier = Modifier.padding(top = 8.dp)
             )
         }
+
+
+
     }
 }
