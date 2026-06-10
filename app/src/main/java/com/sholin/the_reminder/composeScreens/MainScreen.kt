@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -25,13 +26,14 @@ import com.sholin.the_reminder.CommonViewModel
 sealed class Screen(val route: String, val title: String, val icon: ImageVector) {
     object Create : Screen("create", "Add", Icons.Default.Add)
     object List : Screen("list", "Reminders", Icons.AutoMirrored.Filled.List)
+    object Weight : Screen("weight", "Ideal Weight", Icons.Default.CheckCircle)
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MainScreen(viewModel: CommonViewModel) {
     var currentScreen by remember { mutableStateOf<Screen>(Screen.Create) }
-    val items = listOf(Screen.Create, Screen.List)
+    val items = listOf(Screen.Create, Screen.List, Screen.Weight)
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -51,6 +53,7 @@ fun MainScreen(viewModel: CommonViewModel) {
         when (currentScreen) {
             is Screen.Create -> CreateReminder(viewModel, innerPadding)
             is Screen.List -> ReminderListScreen(viewModel, innerPadding)
+            is Screen.Weight -> FindIdealWeight(/*viewModel*/ innerPadding)
         }
     }
 }
