@@ -82,7 +82,7 @@ fun CreateReminder(viewModel: CommonViewModel, innerPaddingValues: PaddingValues
                     .weight(1f)
                     .align(alignment = Alignment.CenterVertically)
                     .padding(start = dimensionResource(R.dimen.activity_margin)),
-                text = "Recurring Reminder",
+                text = "Reminder",
                 color = colorResource(R.color.black),
                 style = ComposeTypography.header
             )
