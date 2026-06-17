@@ -22,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -33,15 +34,18 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
+import com.sholin.the_reminder.IdealWeightViewModel
 import com.sholin.the_reminder.R
 import com.sholin.the_reminder.ui.theme.ComposeTypography
 import com.sholin.the_reminder.ui.theme.Typography
 
 @Composable
-fun FindIdealWeight(/*viewModel: CommonViewModel,*/ innerPaddingValues: PaddingValues) {
-    var heightCm by rememberSaveable { mutableStateOf("") }
-    var gender by rememberSaveable { mutableStateOf("Male") }
-    var result by rememberSaveable { mutableStateOf("") }
+fun FindIdealWeight(viewModel: IdealWeightViewModel, innerPaddingValues: PaddingValues) {
+
+    val height by viewModel.height.collectAsState("")
+    val gender by viewModel.gender.collectAsState("")
+    val idealWeight by viewModel.idealWeight.collectAsState("")
 
     Column(
         modifier = Modifier
@@ -64,8 +68,8 @@ fun FindIdealWeight(/*viewModel: CommonViewModel,*/ innerPaddingValues: PaddingV
 
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth().height(70.dp).padding(horizontal = 10.dp),
-                value = heightCm,
-                onValueChange =  { heightCm = it },
+                value = height,
+                onValueChange =  { viewModel.setHeight(it) },
                 shape = RoundedCornerShape(12.dp),
                 colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.Black, unfocusedTextColor = Color.Black),
                 textStyle = Typography.labelMedium,
@@ -77,47 +81,29 @@ fun FindIdealWeight(/*viewModel: CommonViewModel,*/ innerPaddingValues: PaddingV
             Row {
                 RadioButton(
                     selected = gender == "Male",
-                    onClick = { gender = "Male" }
+                    onClick = { viewModel.setGender("Male") }
                 )
                 Text("Male")
                 Spacer(modifier = Modifier.width(16.dp))
                 RadioButton(
                     selected = gender == "Female",
-                    onClick = { gender = "Female" }
+                    onClick = { viewModel.setGender("Female") }
                 )
                 Text("Female")
             }
 
             Button(onClick = {
-                val h = heightCm.toDoubleOrNull()
-                if (h != null) {
-                    val inches = h / 2.54
-                    result = if (gender == "Male") {
-                        val devine = 50 + 2.3 * (inches - 60)
-                        "Ideal weight ≈ %.1f kg".format(devine)
-                    } else {
-                        val devine = 45.5 + 2.3 * (inches - 60)
-                        "Ideal weight ≈ %.1f kg".format(devine)
-                    }
-                } else {
-                    result = "Enter valid height"
-                }
+              viewModel.calculateIdealWeight()
             }) {
                 Text("Calculate")
             }
 
-            if (result.isNotEmpty()) {
+            if (idealWeight.isNotEmpty()) {
                 Text(
-                    result, style = MaterialTheme.typography.headlineLarge,
+                    idealWeight, style = MaterialTheme.typography.headlineLarge,
                     color = Color.Black,)
             }
         }
 
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun IdealWeightPreview() {
-    FindIdealWeight(/*viewModel = CommonViewModel(),*/ innerPaddingValues = PaddingValues(10.dp))
 }

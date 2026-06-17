@@ -16,6 +16,7 @@ import com.sholin.the_reminder.ui.theme.The_ReminderTheme
 
 class MainActivity : ComponentActivity() {
     private val viewModel: CommonViewModel by viewModels()
+    private val idealWeightViewModel: IdealWeightViewModel by viewModels()
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -38,7 +39,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             The_ReminderTheme {
-                MainScreen(viewModel)
+                MainScreen(viewModel,idealWeightViewModel)
             }
         }
     }

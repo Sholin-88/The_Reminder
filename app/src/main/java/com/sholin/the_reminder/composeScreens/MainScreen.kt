@@ -22,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.sholin.the_reminder.CommonViewModel
+import com.sholin.the_reminder.IdealWeightViewModel
 
 sealed class Screen(val route: String, val title: String, val icon: ImageVector) {
     object Create : Screen("create", "Add", Icons.Default.Add)
@@ -31,7 +32,7 @@ sealed class Screen(val route: String, val title: String, val icon: ImageVector)
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun MainScreen(viewModel: CommonViewModel) {
+fun MainScreen(viewModel: CommonViewModel,idealWeightViewModel: IdealWeightViewModel) {
     var currentScreen by remember { mutableStateOf<Screen>(Screen.Create) }
     val items = listOf(Screen.Create, Screen.List, Screen.Weight)
 
@@ -53,7 +54,7 @@ fun MainScreen(viewModel: CommonViewModel) {
         when (currentScreen) {
             is Screen.Create -> CreateReminder(viewModel, innerPadding)
             is Screen.List -> ReminderListScreen(viewModel, innerPadding)
-            is Screen.Weight -> FindIdealWeight(/*viewModel*/ innerPadding)
+            is Screen.Weight -> FindIdealWeight( idealWeightViewModel,innerPadding)
         }
     }
 }
