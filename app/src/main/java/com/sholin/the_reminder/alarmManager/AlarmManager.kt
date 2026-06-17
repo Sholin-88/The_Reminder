@@ -7,6 +7,12 @@ import android.content.Intent
 import android.os.Build
 import android.provider.Settings
 import android.util.Log
+import androidx.annotation.RequiresApi
+import java.time.DayOfWeek
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.ZoneId
+import java.time.temporal.TemporalAdjusters
 
 object AlarmHelper {
 
@@ -63,5 +69,18 @@ object AlarmHelper {
         )
         alarmManager.cancel(pendingIntent)
         Log.d("AlarmHelper", "Alarm canceled for requestCode=$requestCode")
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun calculateNextOccurrence(dayId: Int, time: LocalTime): Long {
+        val dayOfWeek = DayOfWeek.of(dayId)
+        var date = LocalDate.now().with(TemporalAdjusters.nextOrSame(dayOfWeek))
+        
+        // If it's today but the time has already passed, move to next week
+        if (date == LocalDate.now() && time.isBefore(LocalTime.now())) {
+            date = date.with(TemporalAdjusters.next(dayOfWeek))
+        }
+        
+        return date.atTime(time).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
     }
 }

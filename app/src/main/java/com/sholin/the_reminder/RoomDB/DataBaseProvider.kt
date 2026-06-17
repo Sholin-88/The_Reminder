@@ -10,7 +10,8 @@ object DatabaseProvider {
                 context.applicationContext,
                 ReminderDataBase::class.java,
                 "reminder_database"
-            ).build()
+            ).fallbackToDestructiveMigration()
+                .build()
         }
         return db!!
     }

@@ -20,11 +20,9 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -33,8 +31,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TimePicker
-import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -44,15 +40,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sholin.the_reminder.CommonViewModel
 import com.sholin.the_reminder.R
-import com.sholin.the_reminder.Utils
 import com.sholin.the_reminder.ui.theme.ComposeTypography
 import com.sholin.the_reminder.ui.theme.Typography
 import java.time.LocalDate
@@ -64,9 +57,6 @@ import java.util.Locale
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CreateReminder(viewModel: CommonViewModel, innerPaddingValues: PaddingValues) {
-    val focusManager = LocalFocusManager.current
-    val keyboardManager1 = LocalSoftwareKeyboardController.current
-    var showDatePicker by remember { mutableStateOf(false) }
     var showWeekTimePicker by remember { mutableStateOf(false) }
 
     val daysOfWeek = remember {
@@ -92,7 +82,7 @@ fun CreateReminder(viewModel: CommonViewModel, innerPaddingValues: PaddingValues
                     .weight(1f)
                     .align(alignment = Alignment.CenterVertically)
                     .padding(start = dimensionResource(R.dimen.activity_margin)),
-                text = "Reminder",
+                text = "Recurring Reminder",
                 color = colorResource(R.color.black),
                 style = ComposeTypography.header
             )
@@ -120,7 +110,6 @@ fun CreateReminder(viewModel: CommonViewModel, innerPaddingValues: PaddingValues
 
         HorizontalDivider(modifier = Modifier.height(20.dp), thickness = 0.dp, color = Color.Transparent)
 
-
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth().height(70.dp).padding(horizontal = 10.dp),
             value = viewModel.header,
@@ -145,42 +134,7 @@ fun CreateReminder(viewModel: CommonViewModel, innerPaddingValues: PaddingValues
             maxLines = 4
         )
 
-        HorizontalDivider(modifier = Modifier.height(10.dp), thickness = 0.dp, color = Color.Transparent)
-
-        Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp), verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = { showDatePicker = true }) {
-                Icon(imageVector = Icons.Default.DateRange, contentDescription = "Specific Date", tint = colorResource(R.color.teal_200))
-            }
-
-            if (viewModel.selectedDateEpoch.text.isNotEmpty()) {
-                Text(
-                    text = Utils.formatMillis(viewModel.selectedDateEpoch.text.toLong()),
-                    color = colorResource(R.color.black),
-                    style = ComposeTypography.bodyMedium
-                )
-            }
-        }
-
-        // Dialogs
-        if (showWeekTimePicker) {
-            android.app.TimePickerDialog(
-                androidx.compose.ui.platform.LocalContext.current,
-                { _, hourOfDay, minute ->
-                    viewModel.updateSelectedDaysTime(hourOfDay, minute)
-                    showWeekTimePicker = false
-                },
-                12, 0, false
-            ).show()
-        }
-
-        if (showDatePicker) {
-            Utils.DateTimePicker(onDateTimeSelected = { millis ->
-                if (millis > 0) viewModel.updateSelectedDate(millis)
-                showDatePicker = false
-            })
-        }
-
-
+        HorizontalDivider(modifier = Modifier.height(20.dp), thickness = 0.dp, color = Color.Transparent)
 
         // Day Selection Row
         Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -222,11 +176,20 @@ fun CreateReminder(viewModel: CommonViewModel, innerPaddingValues: PaddingValues
                 text = "Every selected day at ${viewModel.selectedDaysTime}",
                 style = Typography.labelSmall,
                 color = colorResource(R.color.purple_500),
-                modifier = Modifier.padding(top = 8.dp)
+                modifier = Modifier.padding(top = 16.dp)
             )
         }
 
-
-
+        // Dialogs
+        if (showWeekTimePicker) {
+            android.app.TimePickerDialog(
+                androidx.compose.ui.platform.LocalContext.current,
+                { _, hourOfDay, minute ->
+                    viewModel.updateSelectedDaysTime(hourOfDay, minute)
+                    showWeekTimePicker = false
+                },
+                12, 0, false
+            ).show()
+        }
     }
 }

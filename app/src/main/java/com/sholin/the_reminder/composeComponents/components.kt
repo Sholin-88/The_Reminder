@@ -223,27 +223,27 @@ fun DateTimePicker(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SingleReminderItem(reminder: Reminder,
                        onCheckedChange: (Boolean) -> Unit,
                        onDeleted: () -> Unit){
-//    val randomColor = remember {
-//        Color(
-//            red = (0..255).random(),
-//            green = (0..255).random(),
-//            blue = (0..255).random()
-//        )
-//    }
-    val color = colorResource(R.color.purple_200)
+    val randomColor = remember {
+        Color(
+            red = (150..255).random(),
+            green = (150..255).random(),
+            blue = (150..255).random()
+        )
+    }
+    val color =randomColor
 
 
     Column(
         modifier = Modifier
-//            .size(150.dp, 120.dp)
             .background(shape = RoundedCornerShape(10.dp), color = color)
             .fillMaxWidth()
-            .padding(dimensionResource(R.dimen.element_spacing))
+            .padding(16.dp)
             .combinedClickable(
                 onClick = { },
                 onLongClick = { onDeleted() }
@@ -253,68 +253,63 @@ fun SingleReminderItem(reminder: Reminder,
         Text(
             modifier = Modifier.fillMaxWidth(),
             text = reminder.header,
-            color = colorResource(R.color.black),
-            style = ComposeTypography.bodyMedium
+            color = Color.Black,
+            style = ComposeTypography.header.copy(fontSize = 18.sp)
         )
-        HorizontalDivider(
-            modifier = Modifier
-                .height(10.dp),
-            thickness = 10.dp,
-            color = color
-        )
+        
+        androidx.compose.foundation.layout.Spacer(modifier = Modifier.height(4.dp))
+        
         Text(
             modifier = Modifier.fillMaxWidth(),
             text = reminder.description,
-            color = colorResource(R.color.black),
-            style = ComposeTypography.defaultType.labelSmall
+            color = Color.DarkGray,
+            style = Typography.labelSmall
         )
-        HorizontalDivider(
-            modifier = Modifier
-                .height(10.dp),
-            thickness = 10.dp,
-            color = color
-        )
-        reminder.date.let {
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = Utils.formatMillis(it.toLong()),
-                color = colorResource(R.color.black),
-                style = ComposeTypography.defaultType.bodyLarge.copy(fontSize = 22.sp, fontWeight = FontWeight.Bold)
-            )
+
+        androidx.compose.foundation.layout.Spacer(modifier = Modifier.height(8.dp))
+
+        val displayText = if (!reminder.repeatDays.isNullOrEmpty() && !reminder.repeatTime.isNullOrEmpty()) {
+            val days = reminder.repeatDays.split(",").map {
+                java.time.DayOfWeek.of(it.toInt()).getDisplayName(java.time.format.TextStyle.SHORT, java.util.Locale.getDefault())
+            }.joinToString(", ")
+            "$days at ${reminder.repeatTime}"
+        } else {
+            Utils.formatMillis(reminder.date.toLong())
         }
 
+        Text(
+            modifier = Modifier.fillMaxWidth(),
+            text = displayText,
+            color = Color.Black,
+            style = ComposeTypography.bodyMedium.copy(fontWeight = FontWeight.Bold)
+        )
+
+        androidx.compose.foundation.layout.Spacer(modifier = Modifier.height(8.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-
-            Text(modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f),
-                text = "Enable Reminder",
-                style = ComposeTypography.bodyMedium)
+            Text(
+                text = "Enabled",
+                style = Typography.labelSmall,
+                color = Color.Black
+            )
             Switch(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                checked = reminder.alarm == true, onCheckedChange = {
-                    onCheckedChange(it)
-                },
+                checked = reminder.alarm == true, 
+                onCheckedChange = { onCheckedChange(it) },
                 colors = SwitchDefaults.colors(
                     checkedThumbColor = colorResource(R.color.purple_500),
-                    uncheckedThumbColor = colorResource(R.color.purple_200))
+                    uncheckedThumbColor = Color.Gray
+                )
             )
         }
-
-        
-
     }
 }
 
 
-
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview()
 @Composable
 fun SingleItemPreview(){

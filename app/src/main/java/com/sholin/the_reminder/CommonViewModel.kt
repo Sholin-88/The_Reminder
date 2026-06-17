@@ -28,7 +28,6 @@ class CommonViewModel(application: Application) : AndroidViewModel(application) 
 
     var header by mutableStateOf(TextFieldValue())
     var description by mutableStateOf(TextFieldValue())
-    var selectedDateEpoch by mutableStateOf(TextFieldValue(""))
     
     // Track multiple selected days by ID (1 for Monday, 7 for Sunday)
     val selectedDayIds = mutableStateListOf<Int>()
@@ -39,15 +38,8 @@ class CommonViewModel(application: Application) : AndroidViewModel(application) 
     fun clearFields() {
         header = TextFieldValue("")
         description = TextFieldValue("")
-        selectedDateEpoch = TextFieldValue("")
         selectedDayIds.clear()
         selectedDaysTime = null
-    }
-
-    fun updateSelectedDate(selectedDate: Long?) {
-        selectedDate?.let {
-            this.selectedDateEpoch = TextFieldValue(it.toString())
-        }
     }
 
     fun updateSelectedDaysTime(hour: Int, minute: Int) {
@@ -65,66 +57,44 @@ class CommonViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     val isCloseVisible: Boolean
-        get() = (selectedDateEpoch.text.isNotEmpty() || selectedDayIds.isNotEmpty()) && description.text.isNotEmpty() && header.text.isNotEmpty()
+        get() = selectedDayIds.isNotEmpty() && description.text.isNotEmpty() && header.text.isNotEmpty()
 
     val isSaveEnabled: Boolean
-        get() = (selectedDateEpoch.text.isNotEmpty() || (selectedDayIds.isNotEmpty() && selectedDaysTime != null)) && description.text.isNotEmpty() && header.text.isNotEmpty()
+        get() = (selectedDayIds.isNotEmpty() && selectedDaysTime != null) && description.text.isNotEmpty() && header.text.isNotEmpty()
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun insertData() {
         viewModelScope.launch {
             if (selectedDayIds.isNotEmpty() && selectedDaysTime != null) {
-                selectedDayIds.forEach { dayId ->
-                    val triggerTime = calculateNextOccurrence(dayId, selectedDaysTime!!)
-                    val reminder = Reminder(
-                        header = header.text,
-                        description = description.text,
-                        date = triggerTime.toString(),
-                        alarm = true
-                    )
-                    // insertReminder should return Long (the row ID)
-                    reminderRepository.insertReminder(reminder)
-                    
-                    AlarmHelper.setAlarm(
-                        appContext,
-                        triggerTime,
-                        reminder.id,
-                        reminder.header,
-                        reminder.description
-                    )
-                }
-            } else if (selectedDateEpoch.text.isNotEmpty()) {
-                val triggerTime = selectedDateEpoch.text.toLong()
+                val daysString = selectedDayIds.joinToString(",")
+                val timeString = selectedDaysTime.toString()
+
+                // Find the soonest occurrence to set the first alarm
+                val soonestTrigger = selectedDayIds
+                    .map { AlarmHelper.calculateNextOccurrence(it, selectedDaysTime!!) }
+                    .minOrNull() ?: 0L
+
                 val reminder = Reminder(
                     header = header.text,
                     description = description.text,
-                    date = triggerTime.toString(),
-                    alarm = true
+                    date = soonestTrigger.toString(),
+                    alarm = true,
+                    repeatDays = daysString,
+                    repeatTime = timeString
                 )
-                 reminderRepository.insertReminder(reminder)
+                
+                val id = reminderRepository.insertReminder(reminder).toInt()
                 
                 AlarmHelper.setAlarm(
                     appContext,
-                    triggerTime,
-                    reminder.id,
+                    soonestTrigger,
+                    id,
                     reminder.header,
                     reminder.description
                 )
             }
             clearFields()
         }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun calculateNextOccurrence(dayId: Int, time: LocalTime): Long {
-        val dayOfWeek = DayOfWeek.of(dayId)
-        var date = LocalDate.now().with(TemporalAdjusters.nextOrSame(dayOfWeek))
-        
-        if (date == LocalDate.now() && time.isBefore(LocalTime.now())) {
-            date = date.with(TemporalAdjusters.next(dayOfWeek))
-        }
-        
-        return date.atTime(time).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
     }
 
     fun deleteData(id: Int) {
@@ -138,15 +108,30 @@ class CommonViewModel(application: Application) : AndroidViewModel(application) 
         viewModelScope.launch {
             reminderRepository.updateSwitchById(reminder.id, isEnabled)
             if (isEnabled) {
-                val triggerTime = reminder.date.toLongOrNull()
-                if (triggerTime != null) {
+                // If it's a recurring reminder, calculate the next occurrence
+                if (reminder.repeatDays != null && reminder.repeatTime != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    val days = reminder.repeatDays.split(",").map { it.toInt() }
+                    val time = LocalTime.parse(reminder.repeatTime)
+                    val nextTrigger = days.map { AlarmHelper.calculateNextOccurrence(it, time) }.minOrNull() ?: 0L
+                    
                     AlarmHelper.setAlarm(
                         appContext,
-                        triggerTime,
+                        nextTrigger,
                         reminder.id,
                         reminder.header,
                         reminder.description
                     )
+                } else {
+                    val triggerTime = reminder.date.toLongOrNull()
+                    if (triggerTime != null) {
+                        AlarmHelper.setAlarm(
+                            appContext,
+                            triggerTime,
+                            reminder.id,
+                            reminder.header,
+                            reminder.description
+                        )
+                    }
                 }
             } else {
                 AlarmHelper.cancelAlarm(appContext, reminder.id)

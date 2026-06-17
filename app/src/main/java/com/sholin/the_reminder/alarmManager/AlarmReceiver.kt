@@ -12,6 +12,11 @@ import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.sholin.the_reminder.R
+import com.sholin.the_reminder.RoomDB.DatabaseProvider
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.time.LocalTime
 
 class AlarmReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
@@ -22,9 +27,8 @@ class AlarmReceiver : BroadcastReceiver() {
         Log.d("AlarmReceiver", "Alarm received for ID=$id, Header=$header")
 
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val channelId = "alarm_channel_v2" // Using a new channel ID to apply new sound settings
+        val channelId = "alarm_channel_v2"
         
-        // Use default alarm sound
         val soundUri: Uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
             ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
 
@@ -58,5 +62,44 @@ class AlarmReceiver : BroadcastReceiver() {
             .build()
 
         notificationManager.notify(id, notification)
+
+        // Reschedule recurring alarm
+        if (id != 0 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val goAsync = goAsync()
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    val db = DatabaseProvider.getDatabase(context)
+                    val dao = db.reminderDao()
+                    val reminder = dao.getReminderById(id)
+                    
+                    if (reminder != null && reminder.alarm == true && reminder.repeatDays != null && reminder.repeatTime != null) {
+                        val days = reminder.repeatDays.split(",").map { it.toInt() }
+                        val time = LocalTime.parse(reminder.repeatTime)
+                        
+                        // Find the next occurrence that is at least 1 minute in the future
+                        val nextTrigger = days.map { dayId ->
+                            AlarmHelper.calculateNextOccurrence(dayId, time)
+                        }.filter { it > System.currentTimeMillis() + 30000 }.minOrNull() // 30 seconds buffer
+                        
+                        if (nextTrigger != null) {
+                            dao.updateReminder(reminder.copy(date = nextTrigger.toString()))
+                            
+                            AlarmHelper.setAlarm(
+                                context,
+                                nextTrigger,
+                                reminder.id,
+                                reminder.header,
+                                reminder.description
+                            )
+                            Log.d("AlarmReceiver", "Rescheduled alarm for ID=$id at $nextTrigger")
+                        }
+                    }
+                } catch (e: Exception) {
+                    Log.e("AlarmReceiver", "Error in rescheduling", e)
+                } finally {
+                    goAsync.finish()
+                }
+            }
+        }
     }
 }

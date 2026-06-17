@@ -12,7 +12,7 @@ class ReminderRepository(val context: Application) {
      fun getReminderList() = dao.getAllUsers()
 
 
-    suspend fun insertReminder(reminder: Reminder) = dao.insertUser(reminder)
+    suspend fun insertReminder(reminder: Reminder): Long = dao.insertUser(reminder)
 
     suspend fun deleteReminder(id: Int) = dao.deleteUser(id)
 
