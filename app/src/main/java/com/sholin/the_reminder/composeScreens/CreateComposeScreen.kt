@@ -44,8 +44,10 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.sholin.the_reminder.CommonViewModel
 import com.sholin.the_reminder.R
+import com.sholin.the_reminder.navigation.Screen
 import com.sholin.the_reminder.ui.theme.ComposeTypography
 import com.sholin.the_reminder.ui.theme.Typography
 import java.time.LocalDate
@@ -56,7 +58,7 @@ import java.util.Locale
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun CreateReminder(viewModel: CommonViewModel, innerPaddingValues: PaddingValues) {
+fun CreateReminder(viewModel: CommonViewModel, navController: NavController,) {
     var showWeekTimePicker by remember { mutableStateOf(false) }
 
     val daysOfWeek = remember {
@@ -67,7 +69,7 @@ fun CreateReminder(viewModel: CommonViewModel, innerPaddingValues: PaddingValues
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = innerPaddingValues.calculateTopPadding())
+            .padding(top = 10.dp)
             .background(color = colorResource(R.color.white)),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
@@ -82,12 +84,15 @@ fun CreateReminder(viewModel: CommonViewModel, innerPaddingValues: PaddingValues
                     .weight(1f)
                     .align(alignment = Alignment.CenterVertically)
                     .padding(start = dimensionResource(R.dimen.activity_margin)),
-                text = "Reminder",
+                text = "Recurring Reminder",
                 color = colorResource(R.color.black),
                 style = ComposeTypography.header
             )
 
-            IconButton(onClick = { viewModel.insertData() },
+            IconButton(onClick = {
+                viewModel.insertData()
+                    navController.navigate(Screen.List.route)
+                                 },
                 enabled = viewModel.isSaveEnabled) {
                 Icon(
                     modifier = Modifier.size(30.dp),

@@ -26,6 +26,7 @@ import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.sholin.the_reminder.CommonViewModel
 import com.sholin.the_reminder.R
 import com.sholin.the_reminder.alarmManager.AlarmHelper
@@ -34,7 +35,7 @@ import com.sholin.the_reminder.ui.theme.ComposeTypography
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun ReminderList(viewModel: CommonViewModel) {
+fun ReminderList(viewModel: CommonViewModel, navController: NavController) {
     val reminderList by viewModel.reminderList.collectAsState()
     val context = LocalContext.current
     val scroll = rememberNestedScrollInteropConnection()

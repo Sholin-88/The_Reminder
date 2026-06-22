@@ -41,6 +41,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.navigation.compose)
     // Room dependencies from version catalog (2.7.0-alpha11)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)

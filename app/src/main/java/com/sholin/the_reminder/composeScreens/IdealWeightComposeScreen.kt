@@ -35,13 +35,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
+import androidx.navigation.NavController
 import com.sholin.the_reminder.IdealWeightViewModel
 import com.sholin.the_reminder.R
 import com.sholin.the_reminder.ui.theme.ComposeTypography
 import com.sholin.the_reminder.ui.theme.Typography
 
 @Composable
-fun FindIdealWeight(viewModel: IdealWeightViewModel, innerPaddingValues: PaddingValues) {
+fun FindIdealWeight(viewModel: IdealWeightViewModel, navController: NavController) {
 
     val height by viewModel.height.collectAsState("")
     val gender by viewModel.gender.collectAsState("")
@@ -50,7 +51,7 @@ fun FindIdealWeight(viewModel: IdealWeightViewModel, innerPaddingValues: Padding
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = innerPaddingValues.calculateTopPadding())
+            .padding(top = 10.dp)
             .background(color = colorResource(R.color.white)),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
