@@ -1,11 +1,15 @@
-package com.sholin.the_reminder
+package com.sholin.the_reminder.presentation.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import com.sholin.the_reminder.domain.use_case.CalculateIdealWeightUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-class IdealWeightViewModel(application: Application) : AndroidViewModel(application)  {
+class IdealWeightViewModel(
+    application: Application,
+    private val calculateIdealWeightUseCase: CalculateIdealWeightUseCase
+) : AndroidViewModel(application)  {
 
     private val _height = MutableStateFlow("")
     val height: StateFlow<String> = _height
@@ -27,18 +31,7 @@ class IdealWeightViewModel(application: Application) : AndroidViewModel(applicat
 
     fun calculateIdealWeight() {
         val h = _height.value.toDoubleOrNull()
-        if (h != null) {
-            val inches = h / 2.54
-            _idealWeight.value = if (_gender.value == "Male") {
-                val devine = 50 + 2.3 * (inches - 60)
-                "Ideal weight ≈ %.1f kg".format(devine)
-            } else {
-                val devine = 45.5 + 2.3 * (inches - 60)
-                "Ideal weight ≈ %.1f kg".format(devine)
-            }
-        } else {
-            _idealWeight.value = "Enter valid height"
-        }
+        _idealWeight.value = calculateIdealWeightUseCase(h, _gender.value)
     }
 
 }

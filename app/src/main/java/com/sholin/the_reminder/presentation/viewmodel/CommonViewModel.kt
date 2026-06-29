@@ -1,4 +1,4 @@
-package com.sholin.the_reminder
+package com.sholin.the_reminder.presentation.viewmodel
 
 import android.app.Application
 import android.content.Context
@@ -11,28 +11,24 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.sholin.the_reminder.Repository.ReminderRepository
 import com.sholin.the_reminder.alarmManager.AlarmHelper
+import com.sholin.the_reminder.domain.model.Reminder
+import com.sholin.the_reminder.domain.use_case.ReminderUseCases
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import java.time.DayOfWeek
-import java.time.LocalDate
 import java.time.LocalTime
-import java.time.ZoneId
-import java.time.temporal.TemporalAdjusters
 
-class CommonViewModel(application: Application) : AndroidViewModel(application) {
-    val reminderRepository = ReminderRepository(application)
+class CommonViewModel(
+    application: Application,
+    private val useCases: ReminderUseCases
+) : AndroidViewModel(application) {
     private val appContext: Context = application.applicationContext
 
     var header by mutableStateOf(TextFieldValue())
     var description by mutableStateOf(TextFieldValue())
     
-    // Track multiple selected days by ID (1 for Monday, 7 for Sunday)
     val selectedDayIds = mutableStateListOf<Int>()
-    
-    // Dedicated time for multi-day reminders
     var selectedDaysTime by mutableStateOf<LocalTime?>(null)
 
     fun clearFields() {
@@ -69,7 +65,6 @@ class CommonViewModel(application: Application) : AndroidViewModel(application) 
                 val daysString = selectedDayIds.joinToString(",")
                 val timeString = selectedDaysTime.toString()
 
-                // Find the soonest occurrence to set the first alarm
                 val soonestTrigger = selectedDayIds
                     .map { AlarmHelper.calculateNextOccurrence(it, selectedDaysTime!!) }
                     .minOrNull() ?: 0L
@@ -83,7 +78,7 @@ class CommonViewModel(application: Application) : AndroidViewModel(application) 
                     repeatTime = timeString
                 )
                 
-                val id = reminderRepository.insertReminder(reminder).toInt()
+                val id = useCases.addReminder(reminder).toInt()
                 
                 AlarmHelper.setAlarm(
                     appContext,
@@ -100,15 +95,14 @@ class CommonViewModel(application: Application) : AndroidViewModel(application) 
     fun deleteData(id: Int) {
         viewModelScope.launch {
             AlarmHelper.cancelAlarm(appContext, id)
-            reminderRepository.deleteReminder(id)
+            useCases.deleteReminder(id)
         }
     }
 
     fun updateAlarm(reminder: Reminder, isEnabled: Boolean) {
         viewModelScope.launch {
-            reminderRepository.updateSwitchById(reminder.id, isEnabled)
+            useCases.updateAlarm(reminder.id, isEnabled)
             if (isEnabled) {
-                // If it's a recurring reminder, calculate the next occurrence
                 if (reminder.repeatDays != null && reminder.repeatTime != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     val days = reminder.repeatDays.split(",").map { it.toInt() }
                     val time = LocalTime.parse(reminder.repeatTime)
@@ -139,6 +133,6 @@ class CommonViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
-    val reminderList = reminderRepository.getReminderList()
+    val reminderList = useCases.getReminders()
         .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 }

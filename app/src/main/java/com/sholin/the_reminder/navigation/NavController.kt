@@ -8,17 +8,18 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.sholin.the_reminder.CommonViewModel
-import com.sholin.the_reminder.IdealWeightViewModel
-import com.sholin.the_reminder.composeScreens.CreateReminder
-import com.sholin.the_reminder.composeScreens.FindIdealWeight
+import com.sholin.the_reminder.presentation.screens.CreateReminder
+import com.sholin.the_reminder.presentation.screens.FindIdealWeight
+import com.sholin.the_reminder.presentation.screens.ReminderList
+import com.sholin.the_reminder.presentation.viewmodel.CommonViewModel
+import com.sholin.the_reminder.presentation.viewmodel.IdealWeightViewModel
+
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.sholin.the_reminder.composeScreens.ReminderList
 
 sealed class Screen(val route: String, val title: String, val icon: ImageVector) {
     object Create : Screen("create", "Add", Icons.Default.Add)
