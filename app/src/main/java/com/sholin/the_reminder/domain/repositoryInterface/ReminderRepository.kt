@@ -1,4 +1,4 @@
-package com.sholin.the_reminder.domain.repository
+package com.sholin.the_reminder.domain.repositoryInterface
 
 import com.sholin.the_reminder.domain.model.Reminder
 import kotlinx.coroutines.flow.Flow

@@ -4,7 +4,7 @@ import com.sholin.the_reminder.RoomDB.ReminderDao
 import com.sholin.the_reminder.data.mapper.toDomain
 import com.sholin.the_reminder.data.mapper.toEntity
 import com.sholin.the_reminder.domain.model.Reminder
-import com.sholin.the_reminder.domain.repository.ReminderRepository
+import com.sholin.the_reminder.domain.repositoryInterface.ReminderRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 

@@ -1,7 +1,7 @@
 package com.sholin.the_reminder.domain.use_case
 
 import com.sholin.the_reminder.domain.model.Reminder
-import com.sholin.the_reminder.domain.repository.ReminderRepository
+import com.sholin.the_reminder.domain.repositoryInterface.ReminderRepository
 import kotlinx.coroutines.flow.Flow
 
 class GetRemindersUseCase(private val repository: ReminderRepository) {
