@@ -78,14 +78,14 @@ class AlarmReceiver : BroadcastReceiver() {
                         
                         // Find the next occurrence that is at least 1 minute in the future
                         val nextTrigger = days.map { dayId ->
-                            AlarmHelper.calculateNextOccurrence(dayId, time)
+                            AlarmHelperImpl.calculateNextOccurrence(dayId, time)
                         }.filter { it > System.currentTimeMillis() + 30000 }.minOrNull() // 30 seconds buffer
                         
                         if (nextTrigger != null) {
                             dao.updateReminder(reminder.copy(date = nextTrigger.toString()))
                             
-                            AlarmHelper.setAlarm(
-                                context,
+                            val scheduler = AlarmHelperImpl(context)
+                            scheduler.setAlarm(
                                 nextTrigger,
                                 reminder.id,
                                 reminder.header,

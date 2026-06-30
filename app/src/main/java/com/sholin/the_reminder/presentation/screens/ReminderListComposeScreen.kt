@@ -28,7 +28,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.sholin.the_reminder.R
-import com.sholin.the_reminder.alarmManager.AlarmHelper
 import com.sholin.the_reminder.presentation.components.SingleReminderItem
 import com.sholin.the_reminder.presentation.viewmodel.CommonViewModel
 import com.sholin.the_reminder.ui.theme.ComposeTypography
@@ -37,7 +36,6 @@ import com.sholin.the_reminder.ui.theme.ComposeTypography
 @Composable
 fun ReminderList(viewModel: CommonViewModel, navController: NavController) {
     val reminderList by viewModel.reminderList.collectAsState()
-    val context = LocalContext.current
     val scroll = rememberNestedScrollInteropConnection()
     val state = rememberLazyStaggeredGridState()
 
@@ -73,20 +71,8 @@ fun ReminderList(viewModel: CommonViewModel, navController: NavController) {
                 SingleReminderItem(reminder,
                     onCheckedChange = { isChecked ->
                         viewModel.updateAlarm(reminder, isChecked)
-                        if (isChecked) {
-                            AlarmHelper.setAlarm(
-                                context = context,
-                                triggerAtMillis = reminder.date.toLong(),
-                                requestCode = reminder.id,
-                                header = reminder.header,
-                                description = reminder.description
-                            )
-                        } else {
-                            AlarmHelper.cancelAlarm(context, reminder.id)
-                        }
                     },
                     onDeleted = {
-                        AlarmHelper.cancelAlarm(context, reminder.id)
                         viewModel.deleteData(reminder.id)
                     })
             }

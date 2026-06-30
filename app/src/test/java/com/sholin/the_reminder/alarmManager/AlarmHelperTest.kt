@@ -31,7 +31,7 @@ class AlarmHelperTest {
         every { LocalTime.now() } returns LocalTime.of(10, 0)
 
         // When requesting Monday at 15:00
-        val result = AlarmHelper.calculateNextOccurrence(1, LocalTime.of(15, 0))
+        val result = AlarmHelperImpl.calculateNextOccurrence(1, LocalTime.of(15, 0))
 
         // Then result should be today's timestamp at 15:00
         val expected = today.atTime(15, 0).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
@@ -46,7 +46,7 @@ class AlarmHelperTest {
         every { LocalTime.now() } returns LocalTime.of(10, 0)
 
         // When requesting Monday at 08:00 (already passed)
-        val result = AlarmHelper.calculateNextOccurrence(1, LocalTime.of(8, 0))
+        val result = AlarmHelperImpl.calculateNextOccurrence(1, LocalTime.of(8, 0))
 
         // Then result should be next Monday (2023-10-09) at 08:00
         val nextMonday = today.plusWeeks(1)
@@ -62,7 +62,7 @@ class AlarmHelperTest {
         every { LocalTime.now() } returns LocalTime.of(10, 0)
 
         // When requesting Wednesday (dayId = 3) at 12:00
-        val result = AlarmHelper.calculateNextOccurrence(3, LocalTime.of(12, 0))
+        val result = AlarmHelperImpl.calculateNextOccurrence(3, LocalTime.of(12, 0))
 
         // Then result should be Wednesday 2023-10-04 at 12:00
         val wednesday = LocalDate.of(2023, 10, 4)

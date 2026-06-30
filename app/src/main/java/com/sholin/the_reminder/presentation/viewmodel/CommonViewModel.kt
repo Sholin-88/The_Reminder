@@ -1,7 +1,6 @@
 package com.sholin.the_reminder.presentation.viewmodel
 
 import android.app.Application
-import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.getValue
@@ -11,7 +10,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.sholin.the_reminder.alarmManager.AlarmHelper
+import com.sholin.the_reminder.alarmManager.AlarmHelperImpl
 import com.sholin.the_reminder.domain.model.Reminder
 import com.sholin.the_reminder.domain.use_case.ReminderUseCases
 import kotlinx.coroutines.flow.SharingStarted
@@ -23,7 +22,6 @@ class CommonViewModel(
     application: Application,
     private val useCases: ReminderUseCases
 ) : AndroidViewModel(application) {
-    private val appContext: Context = application.applicationContext
 
     var header by mutableStateOf(TextFieldValue())
     var description by mutableStateOf(TextFieldValue())
@@ -66,7 +64,7 @@ class CommonViewModel(
                 val timeString = selectedDaysTime.toString()
 
                 val soonestTrigger = selectedDayIds
-                    .map { AlarmHelper.calculateNextOccurrence(it, selectedDaysTime!!) }
+                    .map { AlarmHelperImpl.calculateNextOccurrence(it, selectedDaysTime!!) }
                     .minOrNull() ?: 0L
 
                 val reminder = Reminder(
@@ -78,15 +76,7 @@ class CommonViewModel(
                     repeatTime = timeString
                 )
                 
-                val id = useCases.addReminder(reminder).toInt()
-                
-                AlarmHelper.setAlarm(
-                    appContext,
-                    soonestTrigger,
-                    id,
-                    reminder.header,
-                    reminder.description
-                )
+                useCases.addReminder(reminder, soonestTrigger)
             }
             clearFields()
         }
@@ -94,42 +84,23 @@ class CommonViewModel(
 
     fun deleteData(id: Int) {
         viewModelScope.launch {
-            AlarmHelper.cancelAlarm(appContext, id)
             useCases.deleteReminder(id)
         }
     }
 
     fun updateAlarm(reminder: Reminder, isEnabled: Boolean) {
         viewModelScope.launch {
-            useCases.updateAlarm(reminder.id, isEnabled)
+            var nextTrigger: Long? = null
             if (isEnabled) {
                 if (reminder.repeatDays != null && reminder.repeatTime != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     val days = reminder.repeatDays.split(",").map { it.toInt() }
                     val time = LocalTime.parse(reminder.repeatTime)
-                    val nextTrigger = days.map { AlarmHelper.calculateNextOccurrence(it, time) }.minOrNull() ?: 0L
-                    
-                    AlarmHelper.setAlarm(
-                        appContext,
-                        nextTrigger,
-                        reminder.id,
-                        reminder.header,
-                        reminder.description
-                    )
+                    nextTrigger = days.map { AlarmHelperImpl.calculateNextOccurrence(it, time) }.minOrNull()
                 } else {
-                    val triggerTime = reminder.date.toLongOrNull()
-                    if (triggerTime != null) {
-                        AlarmHelper.setAlarm(
-                            appContext,
-                            triggerTime,
-                            reminder.id,
-                            reminder.header,
-                            reminder.description
-                        )
-                    }
+                    nextTrigger = reminder.date.toLongOrNull()
                 }
-            } else {
-                AlarmHelper.cancelAlarm(appContext, reminder.id)
             }
+            useCases.updateAlarm(reminder, isEnabled, nextTrigger)
         }
     }
 

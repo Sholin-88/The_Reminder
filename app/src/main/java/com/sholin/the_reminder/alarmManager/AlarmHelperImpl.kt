@@ -8,26 +8,27 @@ import android.os.Build
 import android.provider.Settings
 import android.util.Log
 import androidx.annotation.RequiresApi
+import com.sholin.the_reminder.domain.alarm.AlarmScheduler
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.temporal.TemporalAdjusters
 
-object AlarmHelper {
+class AlarmHelperImpl(private val context: Context) : AlarmScheduler {
 
-    fun setAlarm(context: Context, triggerAtMillis: Long, requestCode: Int, header: String, description: String) {
+    override fun setAlarm(triggerAtMillis: Long, id: Int, header: String, description: String) {
         val alarmManager = context.getSystemService(AlarmManager::class.java) ?: return
 
         val intent = Intent(context, AlarmReceiver::class.java).apply {
-            putExtra("EXTRA_ID", requestCode)
+            putExtra("EXTRA_ID", id)
             putExtra("EXTRA_HEADER", header)
             putExtra("EXTRA_DESC", description)
         }
 
         val pendingIntent = PendingIntent.getBroadcast(
             context,
-            requestCode,
+            id,
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
@@ -58,29 +59,30 @@ object AlarmHelper {
         }
     }
 
-    fun cancelAlarm(context: Context, requestCode: Int) {
+    override fun cancelAlarm(id: Int) {
         val alarmManager = context.getSystemService(AlarmManager::class.java) ?: return
         val intent = Intent(context, AlarmReceiver::class.java)
         val pendingIntent = PendingIntent.getBroadcast(
             context,
-            requestCode,
+            id,
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         alarmManager.cancel(pendingIntent)
-        Log.d("AlarmHelper", "Alarm canceled for requestCode=$requestCode")
+        Log.d("AlarmHelper", "Alarm canceled for id=$id")
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun calculateNextOccurrence(dayId: Int, time: LocalTime): Long {
-        val dayOfWeek = DayOfWeek.of(dayId)
-        var date = LocalDate.now().with(TemporalAdjusters.nextOrSame(dayOfWeek))
-        
-        // If it's today but the time has already passed, move to next week
-        if (date == LocalDate.now() && time.isBefore(LocalTime.now())) {
-            date = date.with(TemporalAdjusters.next(dayOfWeek))
+    companion object {
+        @RequiresApi(Build.VERSION_CODES.O)
+        fun calculateNextOccurrence(dayId: Int, time: LocalTime): Long {
+            val dayOfWeek = DayOfWeek.of(dayId)
+            var date = LocalDate.now().with(TemporalAdjusters.nextOrSame(dayOfWeek))
+            
+            if (date == LocalDate.now() && time.isBefore(LocalTime.now())) {
+                date = date.with(TemporalAdjusters.next(dayOfWeek))
+            }
+            
+            return date.atTime(time).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
         }
-        
-        return date.atTime(time).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
     }
 }
