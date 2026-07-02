@@ -13,7 +13,7 @@ class IdealWeightViewModel(
     private val calculateIdealWeightUseCase: CalculateIdealWeightUseCase,
     private val firebase: FirebaseProvider
 ) : AndroidViewModel(application)  {
-
+    val databaseRef = firebase.getDatabaseReference("weight_records")
     private val _height = MutableStateFlow("")
     val height: StateFlow<String> = _height
 
@@ -44,7 +44,7 @@ class IdealWeightViewModel(
 
     private fun saveRecordToFirebase(height: String, gender: String, idealWeight: String) {
         val record = WeightRecord(height, gender, idealWeight)
-        val databaseRef = firebase.getDatabaseReference("weight_records")
+
         databaseRef.push().setValue(record)
             .addOnSuccessListener {
                 firebase.log("Weight record saved to Firebase")
