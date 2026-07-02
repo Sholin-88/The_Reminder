@@ -104,7 +104,14 @@ fun FindIdealWeight(viewModel: IdealWeightViewModel, navController: NavControlle
                     idealWeight, style = MaterialTheme.typography.headlineLarge,
                     color = Color.Black,)
             }
-        }
 
+            Spacer(modifier = Modifier.height(20.dp))
+            Button(
+                onClick = { throw RuntimeException("Test Crash") },
+                colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = Color.Red)
+            ) {
+                Text("Test Crash", color = Color.White)
+            }
+        }
     }
 }

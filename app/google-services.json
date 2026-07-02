@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "256879095692",
+    "project_id": "thereminder-96792",
+    "storage_bucket": "thereminder-96792.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:256879095692:android:3894e532621ef48445f0a9",
+        "android_client_info": {
+          "package_name": "com.sholin.the_reminder"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBfdaJEPgF8DgGHSFu6_f2mtm32Yvrwbjk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

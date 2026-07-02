@@ -19,11 +19,13 @@ import com.sholin.the_reminder.presentation.viewmodel.IdealWeightViewModel
 import com.sholin.the_reminder.ui.theme.The_ReminderTheme
 
 class MainActivity : ComponentActivity() {
+    private val firebaseProvider by lazy { (application as TheReminderApp).firebaseProvider }
+
     private val viewModel: CommonViewModel by viewModels {
         object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 val app = application as TheReminderApp
-                return CommonViewModel(app, app.reminderUseCases) as T
+                return CommonViewModel(app, app.reminderUseCases, app.firebaseProvider) as T
             }
         }
     }
@@ -31,7 +33,7 @@ class MainActivity : ComponentActivity() {
         object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 val app = application as TheReminderApp
-                return IdealWeightViewModel(app, app.calculateIdealWeightUseCase) as T
+                return IdealWeightViewModel(app, app.calculateIdealWeightUseCase, app.firebaseProvider) as T
             }
         }
     }
@@ -43,6 +45,7 @@ class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        firebaseProvider.log("MainActivity created")
         enableEdgeToEdge()
         
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {

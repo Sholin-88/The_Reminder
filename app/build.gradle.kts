@@ -6,6 +6,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.google.gms.google.services)
+    alias(libs.plugins.google.firebase.crashlytics)
 }
 
 android {
@@ -45,6 +47,9 @@ dependencies {
     // Room dependencies from version catalog (2.7.0-alpha11)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
+    implementation(libs.firebase.crashlytics)
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.database)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.paging)
     testImplementation("androidx.room:room-testing:${libs.versions.room.get()}")

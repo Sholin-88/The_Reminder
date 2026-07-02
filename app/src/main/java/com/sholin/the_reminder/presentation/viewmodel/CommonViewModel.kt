@@ -11,6 +11,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.sholin.the_reminder.alarmManager.AlarmHelperImpl
+import com.sholin.the_reminder.Firebase.FirebaseProvider
 import com.sholin.the_reminder.domain.model.Reminder
 import com.sholin.the_reminder.domain.use_case.ReminderUseCases
 import kotlinx.coroutines.flow.SharingStarted
@@ -20,8 +21,10 @@ import java.time.LocalTime
 
 class CommonViewModel(
     application: Application,
-    private val useCases: ReminderUseCases
+    private val useCases: ReminderUseCases,
+    private val firebase: FirebaseProvider
 ) : AndroidViewModel(application) {
+    val databaseRef = firebase.getDatabaseReference("reminders")
 
     var header by mutableStateOf(TextFieldValue())
     var description by mutableStateOf(TextFieldValue())
@@ -60,6 +63,7 @@ class CommonViewModel(
     fun insertData() {
         viewModelScope.launch {
             if (selectedDayIds.isNotEmpty() && selectedDaysTime != null) {
+                firebase.log("Inserting reminder: ${header.text}")
                 val daysString = selectedDayIds.joinToString(",")
                 val timeString = selectedDaysTime.toString()
 
@@ -76,14 +80,29 @@ class CommonViewModel(
                     repeatTime = timeString
                 )
                 
-                useCases.addReminder(reminder, soonestTrigger)
+                val id = useCases.addReminder(reminder, soonestTrigger)
+                
+                // Also save to Firebase for backup/sync
+                saveReminderToFirebase(reminder.copy(id = id.toInt()))
             }
             clearFields()
         }
     }
 
+    private fun saveReminderToFirebase(reminder: Reminder) {
+
+        databaseRef.child(reminder.id.toString()).setValue(reminder)
+            .addOnSuccessListener {
+                firebase.log("Reminder saved to Firebase: ${reminder.id}")
+            }
+            .addOnFailureListener { e ->
+                firebase.recordException(e)
+            }
+    }
+
     fun deleteData(id: Int) {
         viewModelScope.launch {
+            firebase.log("Delete reminder: $id")
             useCases.deleteReminder(id)
         }
     }
