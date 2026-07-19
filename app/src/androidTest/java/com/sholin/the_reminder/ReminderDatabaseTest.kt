@@ -5,6 +5,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.sholin.the_reminder.RoomDB.ReminderDao
 import com.sholin.the_reminder.RoomDB.ReminderDataBase
+import com.sholin.the_reminder.model.Reminder
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.After

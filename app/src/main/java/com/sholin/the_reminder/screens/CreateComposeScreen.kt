@@ -1,14 +1,14 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package com.sholin.the_reminder.presentation.screens
+package com.sholin.the_reminder.screens
 
+import android.app.TimePickerDialog
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -40,6 +40,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.dp
@@ -47,7 +48,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.sholin.the_reminder.R
 import com.sholin.the_reminder.navigation.Screen
-import com.sholin.the_reminder.presentation.viewmodel.CommonViewModel
+import com.sholin.the_reminder.viewmodel.CommonViewModel
 import com.sholin.the_reminder.ui.theme.ComposeTypography
 import com.sholin.the_reminder.ui.theme.Typography
 import java.time.LocalDate
@@ -187,8 +188,8 @@ fun CreateReminder(viewModel: CommonViewModel, navController: NavController,) {
 
         // Dialogs
         if (showWeekTimePicker) {
-            android.app.TimePickerDialog(
-                androidx.compose.ui.platform.LocalContext.current,
+            TimePickerDialog(
+                LocalContext.current,
                 { _, hourOfDay, minute ->
                     viewModel.updateSelectedDaysTime(hourOfDay, minute)
                     showWeekTimePicker = false

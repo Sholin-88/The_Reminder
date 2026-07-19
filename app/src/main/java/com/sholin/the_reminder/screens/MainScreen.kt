@@ -1,10 +1,8 @@
-package com.sholin.the_reminder.presentation.screens
+package com.sholin.the_reminder.screens
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -13,15 +11,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.sholin.the_reminder.navigation.AppNavHost
 import com.sholin.the_reminder.navigation.Screen
-import com.sholin.the_reminder.presentation.viewmodel.CommonViewModel
-import com.sholin.the_reminder.presentation.viewmodel.IdealWeightViewModel
+import com.sholin.the_reminder.viewmodel.CommonViewModel
+import com.sholin.the_reminder.viewmodel.IdealWeightViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable

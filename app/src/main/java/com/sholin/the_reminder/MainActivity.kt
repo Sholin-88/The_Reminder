@@ -13,9 +13,9 @@ import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.sholin.the_reminder.presentation.screens.MainScreen
-import com.sholin.the_reminder.presentation.viewmodel.CommonViewModel
-import com.sholin.the_reminder.presentation.viewmodel.IdealWeightViewModel
+import com.sholin.the_reminder.screens.MainScreen
+import com.sholin.the_reminder.viewmodel.CommonViewModel
+import com.sholin.the_reminder.viewmodel.IdealWeightViewModel
 import com.sholin.the_reminder.ui.theme.The_ReminderTheme
 
 class MainActivity : ComponentActivity() {
@@ -25,7 +25,7 @@ class MainActivity : ComponentActivity() {
         object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 val app = application as TheReminderApp
-                return CommonViewModel(app, app.reminderUseCases, app.firebaseProvider) as T
+                return CommonViewModel(app, app.repository, app.alarmHelper, app.firebaseProvider) as T
             }
         }
     }
@@ -33,7 +33,7 @@ class MainActivity : ComponentActivity() {
         object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 val app = application as TheReminderApp
-                return IdealWeightViewModel(app, app.calculateIdealWeightUseCase, app.firebaseProvider) as T
+                return IdealWeightViewModel(app, app.firebaseProvider) as T
             }
         }
     }

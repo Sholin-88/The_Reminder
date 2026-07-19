@@ -1,10 +1,9 @@
-package com.sholin.the_reminder.presentation.components
+package com.sholin.the_reminder.screens
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.icu.util.Calendar
 import android.os.Build
-import android.widget.DatePicker
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -13,7 +12,7 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -22,34 +21,23 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchColors
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldColors
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.TimePicker
 import androidx.compose.material3.rememberDatePickerState
-import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -58,18 +46,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.room.util.TableInfo
 import com.sholin.the_reminder.R
 import com.sholin.the_reminder.Utils
-import com.sholin.the_reminder.domain.model.Reminder
+import com.sholin.the_reminder.model.Reminder
 import com.sholin.the_reminder.ui.theme.ComposeTypography
 import com.sholin.the_reminder.ui.theme.Typography
+import java.time.DayOfWeek
+import java.time.format.TextStyle
+import java.util.Locale
 
 @Composable
 fun CustomButton(){
@@ -256,8 +245,8 @@ fun SingleReminderItem(reminder: Reminder,
             color = Color.Black,
             style = ComposeTypography.header.copy(fontSize = 18.sp)
         )
-        
-        androidx.compose.foundation.layout.Spacer(modifier = Modifier.height(4.dp))
+
+        Spacer(modifier = Modifier.height(4.dp))
         
         Text(
             modifier = Modifier.fillMaxWidth(),
@@ -266,11 +255,11 @@ fun SingleReminderItem(reminder: Reminder,
             style = Typography.labelSmall
         )
 
-        androidx.compose.foundation.layout.Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         val displayText = if (!reminder.repeatDays.isNullOrEmpty() && !reminder.repeatTime.isNullOrEmpty()) {
             val days = reminder.repeatDays.split(",").map {
-                java.time.DayOfWeek.of(it.toInt()).getDisplayName(java.time.format.TextStyle.SHORT, java.util.Locale.getDefault())
+                DayOfWeek.of(it.toInt()).getDisplayName(TextStyle.SHORT, Locale.getDefault())
             }.joinToString(", ")
             "$days at ${reminder.repeatTime}"
         } else {
@@ -284,7 +273,7 @@ fun SingleReminderItem(reminder: Reminder,
             style = ComposeTypography.bodyMedium.copy(fontWeight = FontWeight.Bold)
         )
 
-        androidx.compose.foundation.layout.Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),

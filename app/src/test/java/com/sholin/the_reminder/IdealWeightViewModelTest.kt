@@ -1,8 +1,8 @@
 package com.sholin.the_reminder
 
 import android.app.Application
-import com.sholin.the_reminder.domain.use_case.CalculateIdealWeightUseCase
-import com.sholin.the_reminder.presentation.viewmodel.IdealWeightViewModel
+import com.sholin.the_reminder.Firebase.FirebaseProvider
+import com.sholin.the_reminder.viewmodel.IdealWeightViewModel
 import io.mockk.mockk
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -12,11 +12,11 @@ class IdealWeightViewModelTest {
 
     private lateinit var viewModel: IdealWeightViewModel
     private val application = mockk<Application>(relaxed = true)
-    private val calculateIdealWeightUseCase = CalculateIdealWeightUseCase()
+    private val firebase = mockk<FirebaseProvider>(relaxed = true)
 
     @Before
     fun setup() {
-        viewModel = IdealWeightViewModel(application, calculateIdealWeightUseCase)
+        viewModel = IdealWeightViewModel(application, firebase)
     }
 
     @Test

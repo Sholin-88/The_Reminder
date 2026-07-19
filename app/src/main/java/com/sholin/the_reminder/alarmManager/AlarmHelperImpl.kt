@@ -8,16 +8,15 @@ import android.os.Build
 import android.provider.Settings
 import android.util.Log
 import androidx.annotation.RequiresApi
-import com.sholin.the_reminder.domain.alarm.AlarmScheduler
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.temporal.TemporalAdjusters
 
-class AlarmHelperImpl(private val context: Context) : AlarmScheduler {
+class AlarmHelperImpl(private val context: Context) {
 
-    override fun setAlarm(triggerAtMillis: Long, id: Int, header: String, description: String) {
+    fun setAlarm(triggerAtMillis: Long, id: Int, header: String, description: String) {
         val alarmManager = context.getSystemService(AlarmManager::class.java) ?: return
 
         val intent = Intent(context, AlarmReceiver::class.java).apply {
@@ -59,7 +58,7 @@ class AlarmHelperImpl(private val context: Context) : AlarmScheduler {
         }
     }
 
-    override fun cancelAlarm(id: Int) {
+    fun cancelAlarm(id: Int) {
         val alarmManager = context.getSystemService(AlarmManager::class.java) ?: return
         val intent = Intent(context, AlarmReceiver::class.java)
         val pendingIntent = PendingIntent.getBroadcast(

@@ -1,4 +1,4 @@
-package com.sholin.the_reminder
+package com.sholin.the_reminder.model
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

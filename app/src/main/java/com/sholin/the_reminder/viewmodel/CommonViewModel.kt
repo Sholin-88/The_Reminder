@@ -1,4 +1,4 @@
-package com.sholin.the_reminder.presentation.viewmodel
+package com.sholin.the_reminder.viewmodel
 
 import android.app.Application
 import android.os.Build
@@ -10,10 +10,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.sholin.the_reminder.alarmManager.AlarmHelperImpl
 import com.sholin.the_reminder.Firebase.FirebaseProvider
-import com.sholin.the_reminder.domain.model.Reminder
-import com.sholin.the_reminder.domain.use_case.ReminderUseCases
+import com.sholin.the_reminder.Repository.ReminderRepository
+import com.sholin.the_reminder.alarmManager.AlarmHelperImpl
+import com.sholin.the_reminder.model.Reminder
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -21,14 +21,15 @@ import java.time.LocalTime
 
 class CommonViewModel(
     application: Application,
-    private val useCases: ReminderUseCases,
+    private val repository: ReminderRepository,
+    private val alarmHelper: AlarmHelperImpl,
     private val firebase: FirebaseProvider
 ) : AndroidViewModel(application) {
     val databaseRef = firebase.getDatabaseReference("reminders")
 
     var header by mutableStateOf(TextFieldValue())
     var description by mutableStateOf(TextFieldValue())
-    
+
     val selectedDayIds = mutableStateListOf<Int>()
     var selectedDaysTime by mutableStateOf<LocalTime?>(null)
 
@@ -68,7 +69,12 @@ class CommonViewModel(
                 val timeString = selectedDaysTime.toString()
 
                 val soonestTrigger = selectedDayIds
-                    .map { AlarmHelperImpl.calculateNextOccurrence(it, selectedDaysTime!!) }
+                    .map {
+                        AlarmHelperImpl.Companion.calculateNextOccurrence(
+                            it,
+                            selectedDaysTime!!
+                        )
+                    }
                     .minOrNull() ?: 0L
 
                 val reminder = Reminder(
@@ -79,9 +85,18 @@ class CommonViewModel(
                     repeatDays = daysString,
                     repeatTime = timeString
                 )
-                
-                val id = useCases.addReminder(reminder, soonestTrigger)
-                
+
+                val id = repository.insertReminder(reminder)
+
+                if (reminder.alarm == true) {
+                    alarmHelper.setAlarm(
+                        soonestTrigger,
+                        id.toInt(),
+                        reminder.header,
+                        reminder.description
+                    )
+                }
+
                 // Also save to Firebase for backup/sync
                 saveReminderToFirebase(reminder.copy(id = id.toInt()))
             }
@@ -90,7 +105,6 @@ class CommonViewModel(
     }
 
     private fun saveReminderToFirebase(reminder: Reminder) {
-
         databaseRef.child(reminder.id.toString()).setValue(reminder)
             .addOnSuccessListener {
                 firebase.log("Reminder saved to Firebase: ${reminder.id}")
@@ -103,26 +117,40 @@ class CommonViewModel(
     fun deleteData(id: Int) {
         viewModelScope.launch {
             firebase.log("Delete reminder: $id")
-            useCases.deleteReminder(id)
+            alarmHelper.cancelAlarm(id)
+            repository.deleteReminder(id)
         }
     }
 
     fun updateAlarm(reminder: Reminder, isEnabled: Boolean) {
         viewModelScope.launch {
+            repository.updateAlarm(reminder.id, isEnabled)
+
             var nextTrigger: Long? = null
             if (isEnabled) {
                 if (reminder.repeatDays != null && reminder.repeatTime != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     val days = reminder.repeatDays.split(",").map { it.toInt() }
                     val time = LocalTime.parse(reminder.repeatTime)
-                    nextTrigger = days.map { AlarmHelperImpl.calculateNextOccurrence(it, time) }.minOrNull()
+                    nextTrigger =
+                        days.map { AlarmHelperImpl.calculateNextOccurrence(it, time) }.minOrNull()
                 } else {
                     nextTrigger = reminder.date.toLongOrNull()
                 }
+
+                if (nextTrigger != null) {
+                    alarmHelper.setAlarm(
+                        nextTrigger,
+                        reminder.id,
+                        reminder.header,
+                        reminder.description
+                    )
+                }
+            } else {
+                alarmHelper.cancelAlarm(reminder.id)
             }
-            useCases.updateAlarm(reminder, isEnabled, nextTrigger)
         }
     }
 
-    val reminderList = useCases.getReminders()
+    val reminderList = repository.getReminderList()
         .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 }

@@ -1,4 +1,4 @@
-package com.sholin.the_reminder.domain.model
+package com.sholin.the_reminder.model
 
 data class WeightRecord(
     val height: String,

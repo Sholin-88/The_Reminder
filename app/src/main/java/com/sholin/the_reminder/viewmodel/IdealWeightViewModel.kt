@@ -1,16 +1,14 @@
-package com.sholin.the_reminder.presentation.viewmodel
+package com.sholin.the_reminder.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import com.sholin.the_reminder.Firebase.FirebaseProvider
-import com.sholin.the_reminder.domain.model.WeightRecord
-import com.sholin.the_reminder.domain.use_case.CalculateIdealWeightUseCase
+import com.sholin.the_reminder.model.WeightRecord
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 class IdealWeightViewModel(
     application: Application,
-    private val calculateIdealWeightUseCase: CalculateIdealWeightUseCase,
     private val firebase: FirebaseProvider
 ) : AndroidViewModel(application)  {
     val databaseRef = firebase.getDatabaseReference("weight_records")
@@ -34,10 +32,22 @@ class IdealWeightViewModel(
 
     fun calculateIdealWeight() {
         val h = _height.value.toDoubleOrNull()
-        val result = calculateIdealWeightUseCase(h, _gender.value)
+        val result = if (h == null) {
+            "Enter valid height"
+        } else {
+            val inches = h / 2.54
+            if (_gender.value == "Male") {
+                val devine = 50 + 2.3 * (inches - 60)
+                "Ideal weight ≈ %.1f kg".format(devine)
+            } else {
+                val devine = 45.5 + 2.3 * (inches - 60)
+                "Ideal weight ≈ %.1f kg".format(devine)
+            }
+        }
+
         _idealWeight.value = result
-        
-        if (result.isNotEmpty()) {
+
+        if (result.isNotEmpty() && h != null) {
             saveRecordToFirebase(h.toString(), _gender.value ?: "Unknown", result)
         }
     }

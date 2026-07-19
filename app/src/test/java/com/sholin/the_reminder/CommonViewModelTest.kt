@@ -2,8 +2,10 @@ package com.sholin.the_reminder
 
 import android.app.Application
 import androidx.compose.ui.text.input.TextFieldValue
-import com.sholin.the_reminder.domain.use_case.ReminderUseCases
-import com.sholin.the_reminder.presentation.viewmodel.CommonViewModel
+import com.sholin.the_reminder.Firebase.FirebaseProvider
+import com.sholin.the_reminder.Repository.ReminderRepository
+import com.sholin.the_reminder.alarmManager.AlarmHelperImpl
+import com.sholin.the_reminder.viewmodel.CommonViewModel
 import io.mockk.mockk
 import org.junit.Assert.*
 import org.junit.Before
@@ -14,11 +16,13 @@ class CommonViewModelTest {
 
     private lateinit var viewModel: CommonViewModel
     private val application = mockk<Application>(relaxed = true)
-    private val useCases = mockk<ReminderUseCases>(relaxed = true)
+    private val repository = mockk<ReminderRepository>(relaxed = true)
+    private val alarmHelper = mockk<AlarmHelperImpl>(relaxed = true)
+    private val firebase = mockk<FirebaseProvider>(relaxed = true)
 
     @Before
     fun setup() {
-        viewModel = CommonViewModel(application, useCases)
+        viewModel = CommonViewModel(application, repository, alarmHelper, firebase)
     }
 
     @Test
@@ -52,11 +56,11 @@ class CommonViewModelTest {
     }
 
     @Test
-    fun `isCloseVisible returns true when any field has content`() {
+    fun `isCloseVisible returns true when all fields have content`() {
         // Initially false
         assertFalse(viewModel.isCloseVisible)
 
-        // Add header
+        // Add content to all required fields for isCloseVisible logic
         viewModel.header = TextFieldValue("H")
         viewModel.description = TextFieldValue("D")
         viewModel.selectedDayIds.add(1)

@@ -1,4 +1,4 @@
-package com.sholin.the_reminder.presentation.screens
+package com.sholin.the_reminder.screens
 
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -21,15 +21,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.sholin.the_reminder.R
-import com.sholin.the_reminder.presentation.components.SingleReminderItem
-import com.sholin.the_reminder.presentation.viewmodel.CommonViewModel
+import com.sholin.the_reminder.viewmodel.CommonViewModel
 import com.sholin.the_reminder.ui.theme.ComposeTypography
 
 @RequiresApi(Build.VERSION_CODES.O)

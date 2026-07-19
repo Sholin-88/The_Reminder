@@ -8,11 +8,11 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.sholin.the_reminder.presentation.screens.CreateReminder
-import com.sholin.the_reminder.presentation.screens.FindIdealWeight
-import com.sholin.the_reminder.presentation.screens.ReminderList
-import com.sholin.the_reminder.presentation.viewmodel.CommonViewModel
-import com.sholin.the_reminder.presentation.viewmodel.IdealWeightViewModel
+import com.sholin.the_reminder.screens.CreateReminder
+import com.sholin.the_reminder.screens.FindIdealWeight
+import com.sholin.the_reminder.screens.ReminderList
+import com.sholin.the_reminder.viewmodel.CommonViewModel
+import com.sholin.the_reminder.viewmodel.IdealWeightViewModel
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
