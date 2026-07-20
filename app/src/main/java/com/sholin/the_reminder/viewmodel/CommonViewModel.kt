@@ -28,7 +28,7 @@ class CommonViewModel @Inject constructor(
     private val alarmHelper: AlarmHelperImpl,
     private val firebase: FirebaseProvider
 ) : AndroidViewModel(application) {
-    val databaseRef = firebase.getDatabaseReference("reminders")
+    val databaseRef = firebase.getDatabaseReference("/reminders")
 
     var header by mutableStateOf(TextFieldValue())
     var description by mutableStateOf(TextFieldValue())

@@ -1,0 +1,4 @@
+- `[x]` Update `libs.versions.toml` with AGP 9.3.0 and SDK 37
+- `[x]` Update `app/build.gradle.kts` to use version catalog for SDKs
+- `[x]` Update `gradle-wrapper.properties` to Gradle 9.5.0
+- `[x]` Sync and verify build

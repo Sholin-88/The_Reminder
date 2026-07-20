@@ -13,12 +13,12 @@ plugins {
 
 android {
     namespace = "com.sholin.the_reminder"
-    compileSdk = 36
+    compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
         applicationId = "com.sholin.the_reminder"
         minSdk = 24
-        targetSdk = 35
+        targetSdk = libs.versions.targetSdk.get().toInt()
         versionCode = 1
         versionName = "1.0"
 

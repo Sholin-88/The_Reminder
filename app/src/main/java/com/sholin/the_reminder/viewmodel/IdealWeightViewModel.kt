@@ -14,7 +14,7 @@ class IdealWeightViewModel @Inject constructor(
     application: Application,
     private val firebase: FirebaseProvider
 ) : AndroidViewModel(application)  {
-    val databaseRef = firebase.getDatabaseReference("weight_records")
+    val databaseRef = firebase.getDatabaseReference("/weight_records")
     private val _height = MutableStateFlow("")
     val height: StateFlow<String> = _height
 
