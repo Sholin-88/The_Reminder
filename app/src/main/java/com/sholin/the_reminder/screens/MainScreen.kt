@@ -17,12 +17,10 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.sholin.the_reminder.navigation.AppNavHost
 import com.sholin.the_reminder.navigation.Screen
-import com.sholin.the_reminder.viewmodel.CommonViewModel
-import com.sholin.the_reminder.viewmodel.IdealWeightViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun MainScreen(viewModel: CommonViewModel, idealWeightViewModel: IdealWeightViewModel) {
+fun MainScreen() {
     val navController = rememberNavController()
     val items = listOf(Screen.Create, Screen.List, Screen.Weight)
 
@@ -53,10 +51,7 @@ fun MainScreen(viewModel: CommonViewModel, idealWeightViewModel: IdealWeightView
     ) { innerPadding ->
          AppNavHost(
             navController = navController,
-            commonViewModel = viewModel,
-            padding = innerPadding,
-            idealWeightViewModel = idealWeightViewModel
+            padding = innerPadding
         )
     }
 }
-

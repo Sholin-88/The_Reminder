@@ -8,35 +8,19 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import com.sholin.the_reminder.Firebase.FirebaseProvider
 import com.sholin.the_reminder.screens.MainScreen
-import com.sholin.the_reminder.viewmodel.CommonViewModel
-import com.sholin.the_reminder.viewmodel.IdealWeightViewModel
 import com.sholin.the_reminder.ui.theme.The_ReminderTheme
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    private val firebaseProvider by lazy { (application as TheReminderApp).firebaseProvider }
 
-    private val viewModel: CommonViewModel by viewModels {
-        object : ViewModelProvider.Factory {
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                val app = application as TheReminderApp
-                return CommonViewModel(app, app.repository, app.alarmHelper, app.firebaseProvider) as T
-            }
-        }
-    }
-    private val idealWeightViewModel: IdealWeightViewModel by viewModels {
-        object : ViewModelProvider.Factory {
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                val app = application as TheReminderApp
-                return IdealWeightViewModel(app, app.firebaseProvider) as T
-            }
-        }
-    }
+    @Inject
+    lateinit var firebaseProvider: FirebaseProvider
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -60,7 +44,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             The_ReminderTheme {
-                MainScreen(viewModel,idealWeightViewModel)
+                MainScreen()
             }
         }
     }

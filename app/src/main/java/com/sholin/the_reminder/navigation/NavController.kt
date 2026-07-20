@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.hilt.navigation.compose.hiltViewModel
 
 sealed class Screen(val route: String, val title: String, val icon: ImageVector) {
     object Create : Screen("create", "Add", Icons.Default.Add)
@@ -31,9 +32,7 @@ sealed class Screen(val route: String, val title: String, val icon: ImageVector)
 @Composable
 fun AppNavHost(
     navController: NavHostController,
-    padding: PaddingValues,
-    commonViewModel: CommonViewModel,
-    idealWeightViewModel: IdealWeightViewModel
+    padding: PaddingValues
 ) {
     NavHost(
         navController = navController,
@@ -41,12 +40,15 @@ fun AppNavHost(
         startDestination = Screen.Create.route
     ) {
         composable(Screen.Create.route) {
+            val commonViewModel = hiltViewModel<CommonViewModel>()
             CreateReminder(commonViewModel, navController)
         }
         composable(Screen.List.route) {
+            val commonViewModel = hiltViewModel<CommonViewModel>()
             ReminderList(commonViewModel, navController)
         }
         composable(Screen.Weight.route) {
+            val idealWeightViewModel = hiltViewModel<IdealWeightViewModel>()
             FindIdealWeight(idealWeightViewModel, navController)
         }
     }

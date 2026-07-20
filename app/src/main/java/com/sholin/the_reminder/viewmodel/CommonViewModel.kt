@@ -14,12 +14,15 @@ import com.sholin.the_reminder.Firebase.FirebaseProvider
 import com.sholin.the_reminder.Repository.ReminderRepository
 import com.sholin.the_reminder.alarmManager.AlarmHelperImpl
 import com.sholin.the_reminder.model.Reminder
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.LocalTime
+import javax.inject.Inject
 
-class CommonViewModel(
+@HiltViewModel
+class CommonViewModel @Inject constructor(
     application: Application,
     private val repository: ReminderRepository,
     private val alarmHelper: AlarmHelperImpl,

@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.google.gms.google.services)
     alias(libs.plugins.google.firebase.crashlytics)
+    alias(libs.plugins.hilt)
 }
 
 android {
@@ -50,6 +51,9 @@ dependencies {
     implementation(libs.firebase.crashlytics)
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.database)
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
+    implementation(libs.hilt.navigation.compose)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.paging)
     testImplementation("androidx.room:room-testing:${libs.versions.room.get()}")

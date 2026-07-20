@@ -4,10 +4,13 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import com.sholin.the_reminder.Firebase.FirebaseProvider
 import com.sholin.the_reminder.model.WeightRecord
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import javax.inject.Inject
 
-class IdealWeightViewModel(
+@HiltViewModel
+class IdealWeightViewModel @Inject constructor(
     application: Application,
     private val firebase: FirebaseProvider
 ) : AndroidViewModel(application)  {
