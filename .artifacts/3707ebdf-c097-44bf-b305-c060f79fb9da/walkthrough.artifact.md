@@ -1,27 +1,24 @@
-# Walkthrough - SDK and Build Configuration Fix
+# Walkthrough - Unit Test Fixes and Enhancements
 
-I have successfully fixed the SDK version mismatch and dependency conflicts by upgrading the build toolchain.
+I have addressed the unit test failures by establishing a robust testing environment for your ViewModels.
 
 ## Changes Made
 
-### Build Configuration
-- **Upgraded Android Gradle Plugin (AGP)**: Moved from `9.0.1` to `9.3.0` to support dependencies that require higher API levels and plugin features.
-- **Updated SDK Versions**:
-    - `compileSdk` set to **37** (required by Hilt and Lifecycle libraries).
-    - `targetSdk` set to **35**.
-- **Centralized Versions**: Moved `compileSdk` and `targetSdk` into `libs.versions.toml` for easier management.
-- **Upgraded Gradle Wrapper**: Updated Gradle to **9.5.0** as required by AGP 9.3.0.
+### Test Infrastructure
+- **Created [MainDispatcherRule.kt](file:///C:/Sholin'sHUB/Note_App/app/src/test/java/com/sholin/the_reminder/MainDispatcherRule.kt)**:
+    - This rule is essential for testing ViewModels that use `viewModelScope`. It overrides the Main dispatcher with a `TestDispatcher`, preventing `RuntimeException` during initialization.
 
-### Files Modified
-- [libs.versions.toml](file:///C:/Sholin'sHUB/Note_App/gradle/libs.versions.toml): Updated `agp`, added `compileSdk` and `targetSdk`.
-- [app/build.gradle.kts](file:///C:/Sholin'sHUB/Note_App/app/build.gradle.kts): Updated to use version catalog for SDK versions.
-- [gradle-wrapper.properties](file:///C:/Sholin'sHUB/Note_App/gradle/wrapper/gradle-wrapper.properties): Upgraded Gradle version and updated checksum handling.
+### Unit Test Updates
+- **Updated [CommonViewModelTest.kt](file:///C:/Sholin'sHUB/Note_App/app/src/test/java/com/sholin/the_reminder/CommonViewModelTest.kt)**:
+    - Added `MainDispatcherRule` to handle coroutines.
+    - Added `InstantTaskExecutorRule` to handle background tasks and livedata/state operations.
+    - Refined the test cases for `isSaveEnabled`, `isCloseVisible`, and `clearFields`.
+- **Updated [IdealWeightViewModelTest.kt](file:///C:/Sholin'sHUB/Note_App/app/src/test/java/com/sholin/the_reminder/IdealWeightViewModelTest.kt)**:
+    - Added the same testing rules to ensure stability across all ViewModel tests.
 
-## Verification Results
+## ⚙️ Why did the tests fail?
 
-### Automated Tests
-- `gradle_sync`: Finished successfully.
-- `app:assembleDebug`: Build finished successfully.
+The primary reason for the failures was likely the **lack of a Main Coroutine Dispatcher**. When `CommonViewModel` initializes, it calls `.stateIn(viewModelScope, ...)` which requires a Main dispatcher. In a standard JUnit test environment, the Main dispatcher is not available, leading to immediate failure during ViewModel creation.
 
-> [!NOTE]
-> The project is now using highly experimental/preview versions of AGP and Gradle. This was necessary to satisfy the requirements of the `androidx.hilt:hilt-navigation-compose:1.4.0` and `androidx.lifecycle` libraries currently in use.
+## Next Steps
+You can now run the unit tests again in Android Studio by right-clicking the `test` folder and selecting **Run 'Tests in 'com.sholin.the_reminder''**. The added rules should resolve the initialization errors you were seeing.

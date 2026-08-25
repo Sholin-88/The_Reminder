@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ദി_റിമൈൻഡർ</string>
+    <string name="recurring_reminder">ആവർത്തിക്കുന്ന റിമൈൻഡർ</string>
+    <string name="add_header">തലക്കെട്ട് ചേർക്കുക</string>
+    <string name="add_description">വിവരണം ചേർക്കുക</string>
+    <string name="set_time_for_days">ദിവസങ്ങൾക്ക് സമയം ക്രമീകരിക്കുക</string>
+    <string name="every_selected_day_at">ഓരോ തിരഞ്ഞെടുത്ത ദിവസവും %1$s ന്</string>
+    <string name="select_language">ഭാഷ തിരഞ്ഞെടുക്കുക</string>
+
+</resources>

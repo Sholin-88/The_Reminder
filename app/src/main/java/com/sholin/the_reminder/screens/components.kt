@@ -7,6 +7,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -44,8 +45,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -61,30 +64,36 @@ import java.time.format.TextStyle
 import java.util.Locale
 
 @Composable
-fun CustomButton(){
-        Button(onClick = {
+fun CustomButton() {
+    Button(
+        onClick = {
             //action
         },
-            modifier = Modifier.size(250.dp,50.dp),
-            colors = ButtonDefaults.buttonColors(colorResource(R.color.purple_200)),
-            shape = RoundedCornerShape(10.dp),
-            border = BorderStroke(0.dp,colorResource(R.color.purple_200))
-        ) {
-            Text(text = "Please Click",color = colorResource(R.color.black), fontSize = 20.sp, textAlign = TextAlign.Center)
-        }
+        modifier = Modifier.size(250.dp, 50.dp),
+        colors = ButtonDefaults.buttonColors(colorResource(R.color.purple_200)),
+        shape = RoundedCornerShape(10.dp),
+        border = BorderStroke(0.dp, colorResource(R.color.purple_200))
+    ) {
+        Text(
+            text = "Please Click",
+            color = colorResource(R.color.black),
+            fontSize = 20.sp,
+            textAlign = TextAlign.Center
+        )
     }
+}
 
 @Composable
-fun CustomTextField(){
+fun CustomTextField() {
 
-var textValue by remember { mutableStateOf<String?>(null) }
+    var textValue by remember { mutableStateOf<String?>(null) }
 
     OutlinedTextField(
         modifier = Modifier
             .fillMaxWidth()
             .size(250.dp, 50.dp)
             .background(color = colorResource(R.color.white), shape = RoundedCornerShape(12.dp)),
-        value = textValue?:"",
+        value = textValue ?: "",
         onValueChange = {
             textValue = it
         },
@@ -92,7 +101,7 @@ var textValue by remember { mutableStateOf<String?>(null) }
         colors = OutlinedTextFieldDefaults.colors(Color.Black, Color.Black),
         textStyle = Typography.labelSmall,
         singleLine = true,
-        label = {Text(text = "Add Header")}
+        label = { Text(text = "Add Header") }
     )
 }
 
@@ -215,9 +224,11 @@ fun DateTimePicker(
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun SingleReminderItem(reminder: Reminder,
-                       onCheckedChange: (Boolean) -> Unit,
-                       onDeleted: () -> Unit){
+fun SingleReminderItem(
+    reminder: Reminder,
+    onCheckedChange: (Boolean) -> Unit,
+    onDeleted: () -> Unit
+) {
     val randomColor = remember {
         Color(
             red = (150..255).random(),
@@ -225,7 +236,7 @@ fun SingleReminderItem(reminder: Reminder,
             blue = (150..255).random()
         )
     }
-    val color =randomColor
+    val color = randomColor
 
 
     Column(
@@ -247,7 +258,7 @@ fun SingleReminderItem(reminder: Reminder,
         )
 
         Spacer(modifier = Modifier.height(4.dp))
-        
+
         Text(
             modifier = Modifier.fillMaxWidth(),
             text = reminder.description,
@@ -257,14 +268,15 @@ fun SingleReminderItem(reminder: Reminder,
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        val displayText = if (!reminder.repeatDays.isNullOrEmpty() && !reminder.repeatTime.isNullOrEmpty()) {
-            val days = reminder.repeatDays.split(",").map {
-                DayOfWeek.of(it.toInt()).getDisplayName(TextStyle.SHORT, Locale.getDefault())
-            }.joinToString(", ")
-            "$days at ${reminder.repeatTime}"
-        } else {
-            Utils.formatMillis(reminder.date.toLong())
-        }
+        val displayText =
+            if (!reminder.repeatDays.isNullOrEmpty() && !reminder.repeatTime.isNullOrEmpty()) {
+                val days = reminder.repeatDays.split(",").map {
+                    DayOfWeek.of(it.toInt()).getDisplayName(TextStyle.SHORT, Locale.getDefault())
+                }.joinToString(", ")
+                "$days at ${reminder.repeatTime}"
+            } else {
+                reminder.date.toLongOrNull()?.let { Utils.formatMillis(it) } ?: reminder.date
+            }
 
         Text(
             modifier = Modifier.fillMaxWidth(),
@@ -286,7 +298,7 @@ fun SingleReminderItem(reminder: Reminder,
                 color = Color.Black
             )
             Switch(
-                checked = reminder.alarm == true, 
+                checked = reminder.alarm == true,
                 onCheckedChange = { onCheckedChange(it) },
                 colors = SwitchDefaults.colors(
                     checkedThumbColor = colorResource(R.color.purple_500),
@@ -297,19 +309,42 @@ fun SingleReminderItem(reminder: Reminder,
     }
 }
 
+@Composable
+fun CategoryItem(itemName:String, icon: Int) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(5.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center,
+
+    ) {
+        Icon(modifier = Modifier
+            .size(24.dp),
+            painter = painterResource(id = icon),
+            contentDescription = null)
+        Text(text = itemName)
+    }
+}
+
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Preview()
 @Composable
-fun SingleItemPreview(){
-    SingleReminderItem(Reminder(header = "Test", description = "Test am on here on the other hand ", date = "15/12/2026"), onCheckedChange = {true}, onDeleted = {})
+fun SingleItemPreview() {
+    SingleReminderItem(
+        Reminder(
+            header = "Test",
+            description = "Test am on here on the other hand ",
+            date = "1789473600000"
+        ), onCheckedChange = { true }, onDeleted = {})
 }
 
 @Preview(showBackground = true)
 @Composable
 fun PreviewDatePicker() {
     DatePickerModalInput(
-        onDateSelected ={} ,
+        onDateSelected = {},
         onDismiss = {}
     )
 }
@@ -321,16 +356,21 @@ fun PreviewIconButton() {
 }
 
 
-
 @Preview(showBackground = true)
 @Composable
-fun TextFiledPreview(){
+fun TextFiledPreview() {
     CustomTextField()
 }
 
 
 @Preview(showBackground = true)
 @Composable
-fun AvailableButtonsPreview(){
+fun AvailableButtonsPreview() {
     CustomButton()
+}
+
+@Preview(showBackground = true)
+@Composable
+fun CategoryItemPreview() {
+    CategoryItem("Test", R.drawable.ic_launcher_foreground)
 }

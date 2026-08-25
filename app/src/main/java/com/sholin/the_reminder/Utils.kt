@@ -33,10 +33,12 @@ object Utils {
 
     fun formatMillis(millis: Long): String {
         val instant = Instant.ofEpochMilli(millis)
-        val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm a")
+        val formatter = DateTimeFormatter.ofPattern("HH:mm a")
             .withZone(ZoneId.systemDefault())
         return formatter.format(instant)
     }
+
+
 
     @Composable
     fun DateTimePicker(

@@ -1,14 +1,22 @@
 package com.sholin.the_reminder
 
 import android.app.Application
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.sholin.the_reminder.Firebase.FirebaseProvider
 import com.sholin.the_reminder.viewmodel.IdealWeightViewModel
 import io.mockk.mockk
 import org.junit.Assert.assertEquals
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 
 class IdealWeightViewModelTest {
+
+    @get:Rule
+    val mainDispatcherRule = MainDispatcherRule()
+
+    @get:Rule
+    val instantTaskExecutorRule = InstantTaskExecutorRule()
 
     private lateinit var viewModel: IdealWeightViewModel
     private val application = mockk<Application>(relaxed = true)

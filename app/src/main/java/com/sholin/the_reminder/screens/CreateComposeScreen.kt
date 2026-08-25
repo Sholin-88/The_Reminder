@@ -8,6 +8,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,6 +25,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Language
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -43,9 +47,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.core.os.LocaleListCompat
+import androidx.appcompat.app.AppCompatDelegate
+import android.util.Log
 import com.sholin.the_reminder.R
 import com.sholin.the_reminder.navigation.Screen
 import com.sholin.the_reminder.viewmodel.CommonViewModel
@@ -61,6 +69,7 @@ import java.util.Locale
 @Composable
 fun CreateReminder(viewModel: CommonViewModel, navController: NavController,) {
     var showWeekTimePicker by remember { mutableStateOf(false) }
+    var showLanguageMenu by remember { mutableStateOf(false) }
 
     val daysOfWeek = remember {
         val monday = LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
@@ -85,10 +94,53 @@ fun CreateReminder(viewModel: CommonViewModel, navController: NavController,) {
                     .weight(1f)
                     .align(alignment = Alignment.CenterVertically)
                     .padding(start = dimensionResource(R.dimen.activity_margin)),
-                text = "Recurring Reminder",
+                text = stringResource(R.string.recurring_reminder),
                 color = colorResource(R.color.black),
                 style = ComposeTypography.header
             )
+
+            // Language Selector
+            Box {
+                IconButton(onClick = { showLanguageMenu = true }) {
+                    Icon(
+                        imageVector = Icons.Default.Language,
+                        contentDescription = stringResource(R.string.select_language),
+                        tint = colorResource(R.color.black)
+                    )
+                }
+                DropdownMenu(
+                    expanded = showLanguageMenu,
+                    onDismissRequest = { showLanguageMenu = false }
+                ) {
+                    DropdownMenuItem(
+                        text = { Text("English") },
+                        onClick = {
+                            Log.d("LanguageMenu", "Changing to English")
+                            val appLocale: LocaleListCompat = LocaleListCompat.forLanguageTags("en")
+                            AppCompatDelegate.setApplicationLocales(appLocale)
+                            showLanguageMenu = false
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Hindi (हिंदी)") },
+                        onClick = {
+                            Log.d("LanguageMenu", "Changing to Hindi")
+                            val appLocale: LocaleListCompat = LocaleListCompat.forLanguageTags("hi")
+                            AppCompatDelegate.setApplicationLocales(appLocale)
+                            showLanguageMenu = false
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Malayalam (മലയാളം)") },
+                        onClick = {
+                            Log.d("LanguageMenu", "Changing to Malayalam")
+                            val appLocale: LocaleListCompat = LocaleListCompat.forLanguageTags("ml")
+                            AppCompatDelegate.setApplicationLocales(appLocale)
+                            showLanguageMenu = false
+                        }
+                    )
+                }
+            }
 
             IconButton(onClick = {
                 viewModel.insertData()
@@ -117,35 +169,45 @@ fun CreateReminder(viewModel: CommonViewModel, navController: NavController,) {
         HorizontalDivider(modifier = Modifier.height(20.dp), thickness = 0.dp, color = Color.Transparent)
 
         OutlinedTextField(
-            modifier = Modifier.fillMaxWidth().height(70.dp).padding(horizontal = 10.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(70.dp)
+                .padding(horizontal = 10.dp),
             value = viewModel.header,
             onValueChange = { viewModel.header = it },
             shape = RoundedCornerShape(12.dp),
             colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.Black, unfocusedTextColor = Color.Black),
             textStyle = Typography.labelMedium,
             singleLine = true,
-            label = { Text(text = "Add Header") }
+            label = { Text(text = stringResource(R.string.add_header)) }
         )
 
         HorizontalDivider(modifier = Modifier.height(10.dp), thickness = 0.dp, color = Color.Transparent)
 
         OutlinedTextField(
-            modifier = Modifier.fillMaxWidth().height(100.dp).padding(horizontal = 10.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(100.dp)
+                .padding(horizontal = 10.dp),
             value = viewModel.description,
             onValueChange = { viewModel.description = it },
             shape = RoundedCornerShape(12.dp),
             colors = OutlinedTextFieldDefaults.colors(Color.Black, Color.Black),
             textStyle = Typography.labelMedium,
-            label = { Text(text = "Add Description") },
+            label = { Text(text = stringResource(R.string.add_description)) },
             maxLines = 4
         )
 
         HorizontalDivider(modifier = Modifier.height(20.dp), thickness = 0.dp, color = Color.Transparent)
 
         // Day Selection Row
-        Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 10.dp), verticalAlignment = Alignment.CenterVertically) {
             LazyRow(
-                modifier = Modifier.weight(1f).wrapContentHeight(),
+                modifier = Modifier
+                    .weight(1f)
+                    .wrapContentHeight(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 items(daysOfWeek) { date ->
@@ -157,7 +219,11 @@ fun CreateReminder(viewModel: CommonViewModel, navController: NavController,) {
                         modifier = Modifier
                             .width(42.dp)
                             .clip(RoundedCornerShape(12.dp))
-                            .background(if (isSelected) colorResource(R.color.purple_200) else Color.LightGray.copy(alpha = 0.3f))
+                            .background(
+                                if (isSelected) colorResource(R.color.purple_200) else Color.LightGray.copy(
+                                    alpha = 0.3f
+                                )
+                            )
                             .clickable { viewModel.toggleDaySelection(dayId) }
                             .padding(vertical = 10.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
@@ -171,7 +237,7 @@ fun CreateReminder(viewModel: CommonViewModel, navController: NavController,) {
             IconButton(onClick = { showWeekTimePicker = true }) {
                 Icon(
                     imageVector = Icons.Default.Notifications,
-                    contentDescription = "Set Time for Days",
+                    contentDescription = stringResource(R.string.set_time_for_days),
                     tint = if (viewModel.selectedDaysTime != null) colorResource(R.color.purple_200) else Color.Gray
                 )
             }
@@ -179,7 +245,7 @@ fun CreateReminder(viewModel: CommonViewModel, navController: NavController,) {
 
         if (viewModel.selectedDaysTime != null && viewModel.selectedDayIds.isNotEmpty()) {
             Text(
-                text = "Every selected day at ${viewModel.selectedDaysTime}",
+                text = stringResource(R.string.every_selected_day_at, viewModel.selectedDaysTime.toString()),
                 style = Typography.labelSmall,
                 color = colorResource(R.color.purple_500),
                 modifier = Modifier.padding(top = 16.dp)

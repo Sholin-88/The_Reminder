@@ -1,28 +1,34 @@
 package com.sholin.the_reminder
 
 import android.app.Application
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.compose.ui.text.input.TextFieldValue
-import com.sholin.the_reminder.Firebase.FirebaseProvider
 import com.sholin.the_reminder.Repository.ReminderRepository
 import com.sholin.the_reminder.alarmManager.AlarmHelperImpl
 import com.sholin.the_reminder.viewmodel.CommonViewModel
 import io.mockk.mockk
 import org.junit.Assert.*
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import java.time.LocalTime
 
 class CommonViewModelTest {
 
+    @get:Rule
+    val mainDispatcherRule = MainDispatcherRule()
+
+    @get:Rule
+    val instantTaskExecutorRule = InstantTaskExecutorRule()
+
     private lateinit var viewModel: CommonViewModel
     private val application = mockk<Application>(relaxed = true)
     private val repository = mockk<ReminderRepository>(relaxed = true)
     private val alarmHelper = mockk<AlarmHelperImpl>(relaxed = true)
-    private val firebase = mockk<FirebaseProvider>(relaxed = true)
 
     @Before
     fun setup() {
-        viewModel = CommonViewModel(application, repository, alarmHelper, firebase)
+        viewModel = CommonViewModel(application, repository, alarmHelper)
     }
 
     @Test

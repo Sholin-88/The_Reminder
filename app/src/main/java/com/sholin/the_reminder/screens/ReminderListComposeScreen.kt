@@ -2,6 +2,7 @@ package com.sholin.the_reminder.screens
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.ScrollableDefaults
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -39,13 +40,14 @@ fun ReminderList(viewModel: CommonViewModel, navController: NavController) {
 
     if (reminderList.isEmpty()) {
         Box(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize()
+                .background(Color.White),
             contentAlignment = Alignment.Center
         ) {
             Text(
                 text = "No reminders yet.\nTap 'Add' to create one!",
                 textAlign = TextAlign.Center,
-                color = Color.Gray,
+                color = Color.Black,
                 style = ComposeTypography.bodyMedium
             )
         }

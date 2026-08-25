@@ -2,6 +2,7 @@ package com.sholin.the_reminder.RoomDB
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.sholin.the_reminder.model.Reminder
@@ -14,6 +15,9 @@ interface ReminderDao {
 
     @Insert
     suspend fun insertUser(reminder: Reminder): Long
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertOrReplace(reminder: Reminder)
 
     @Query("SELECT * FROM table_reminder ORDER BY id DESC")
     fun getAllUsers(): Flow<List<Reminder>>

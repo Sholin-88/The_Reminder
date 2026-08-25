@@ -1,6 +1,7 @@
 package com.sholin.the_reminder.viewmodel
 
 import android.app.Application
+import androidx.media3.common.MediaItem
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.getValue
@@ -10,7 +11,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.sholin.the_reminder.Firebase.FirebaseProvider
 import com.sholin.the_reminder.Repository.ReminderRepository
 import com.sholin.the_reminder.alarmManager.AlarmHelperImpl
 import com.sholin.the_reminder.model.Reminder
@@ -25,10 +25,8 @@ import javax.inject.Inject
 class CommonViewModel @Inject constructor(
     application: Application,
     private val repository: ReminderRepository,
-    private val alarmHelper: AlarmHelperImpl,
-    private val firebase: FirebaseProvider
+    private val alarmHelper: AlarmHelperImpl
 ) : AndroidViewModel(application) {
-    val databaseRef = firebase.getDatabaseReference("/reminders/data")
 
     var header by mutableStateOf(TextFieldValue())
     var description by mutableStateOf(TextFieldValue())
@@ -67,7 +65,6 @@ class CommonViewModel @Inject constructor(
     fun insertData() {
         viewModelScope.launch {
             if (selectedDayIds.isNotEmpty() && selectedDaysTime != null) {
-                firebase.log("Inserting reminder: ${header.text}")
                 val daysString = selectedDayIds.joinToString(",")
                 val timeString = selectedDaysTime.toString()
 
@@ -99,27 +96,13 @@ class CommonViewModel @Inject constructor(
                         reminder.description
                     )
                 }
-
-                // Also save to Firebase for backup/sync
-                saveReminderToFirebase(reminder.copy(id = id.toInt()))
             }
             clearFields()
         }
     }
 
-    private fun saveReminderToFirebase(reminder: Reminder) {
-        databaseRef.child(reminder.id.toString()).setValue(reminder)
-            .addOnSuccessListener {
-                firebase.log("Reminder saved to Firebase: ${reminder.id}")
-            }
-            .addOnFailureListener { e ->
-                firebase.recordException(e)
-            }
-    }
-
     fun deleteData(id: Int) {
         viewModelScope.launch {
-            firebase.log("Delete reminder: $id")
             alarmHelper.cancelAlarm(id)
             repository.deleteReminder(id)
         }

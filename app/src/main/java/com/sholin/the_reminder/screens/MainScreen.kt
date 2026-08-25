@@ -21,11 +21,13 @@ import com.sholin.the_reminder.navigation.Screen
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MainScreen() {
+    android.util.Log.d("MainScreen", "MainScreen Composing")
     val navController = rememberNavController()
-    val items = listOf(Screen.Create, Screen.List, Screen.Weight)
+    val items = listOf(Screen.Create, Screen.List)
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
+        containerColor = androidx.compose.ui.graphics.Color.White,
         bottomBar = {
             NavigationBar {
                 val navBackStackEntry by navController.currentBackStackEntryAsState()

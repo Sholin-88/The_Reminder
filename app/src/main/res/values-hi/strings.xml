@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">द रिमाइंडर</string>
+    <string name="recurring_reminder">आवर्ती अनुस्मारक</string>
+    <string name="add_header">शीर्षक जोड़ें</string>
+    <string name="add_description">विवरण जोड़ें</string>
+    <string name="set_time_for_days">दिनों के लिए समय निर्धारित करें</string>
+    <string name="every_selected_day_at">हर चयनित दिन %1$s पर</string>
+    <string name="select_language">भाषा चुनें</string>
+</resources>

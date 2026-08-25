@@ -5,11 +5,12 @@ import android.os.Bundle
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.database.FirebaseDatabase
-
 class FirebaseProvider(context: Context) {
     private val crashlytics = FirebaseCrashlytics.getInstance()
     private val analytics = FirebaseAnalytics.getInstance(context)
-    private val database = FirebaseDatabase.getInstance()
+    private val database = FirebaseDatabase.getInstance().apply {
+        setPersistenceEnabled(true)
+    }
 
     init {
         // Test connection

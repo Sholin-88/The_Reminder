@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">The_Reminder</string>
+    <string name="recurring_reminder">Recurring Reminder</string>
+    <string name="add_header">Add Header</string>
+    <string name="add_description">Add Description</string>
+    <string name="set_time_for_days">Set Time for Days</string>
+    <string name="every_selected_day_at">Every selected day at %1$s</string>
+    <string name="select_language">Select Language</string>
 </resources>
