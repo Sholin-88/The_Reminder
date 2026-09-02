@@ -25,6 +25,7 @@ fun MainScreen() {
     val navController = rememberNavController()
     val items = listOf(Screen.Create, Screen.List)
 
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = androidx.compose.ui.graphics.Color.White,
