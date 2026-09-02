@@ -2,7 +2,7 @@ name: Android CI/CD
 
 on:
   push:
-    branches: [ "main" ]   # Runs on push to main branch
+    branches: [ "master" ]   # Runs on push to main branch
   pull_request:            # Also runs on PRs
 
 jobs:
