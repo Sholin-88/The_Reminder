@@ -4,6 +4,7 @@ on:
   push:
     branches: [ "main" ]   # Runs on push to main branch
   pull_request:            # Also runs on PRs
+  workflow_dispatch:       # Allows manual triggering
 
 jobs:
   build:
@@ -24,8 +25,13 @@ jobs:
       - name: Run Unit Tests
         run: ./gradlew test
 
+      - name: Prepare Artifacts Folder
+        run: |
+          mkdir -p build_outputs
+          cp app/build/outputs/apk/debug/app-debug.apk build_outputs/
+
       - name: Upload APK Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: debug-apk
-          path: app/build/outputs/apk/debug/app-debug.apk
+          name: debug-build-outputs
+          path: build_outputs/
