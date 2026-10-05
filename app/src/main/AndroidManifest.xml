@@ -37,6 +37,15 @@
             android:enabled="true"
             android:exported="false" />
 
+        <service
+            android:name=".aidl.RemoteService"
+            android:exported="true"
+            android:permission="com.sholin.the_reminder.aidl.ACCESS_SERVICE">
+            <intent-filter>
+                <action android:name="com.sholin.the_reminder.aidl.RemoteService" />
+            </intent-filter>
+        </service>
+
     </application>
 
 </manifest>

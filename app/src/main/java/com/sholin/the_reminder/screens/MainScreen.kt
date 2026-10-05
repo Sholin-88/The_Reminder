@@ -21,7 +21,6 @@ import com.sholin.the_reminder.navigation.Screen
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MainScreen() {
-    android.util.Log.d("MainScreen", "MainScreen Composing")
     val navController = rememberNavController()
     val items = listOf(Screen.Create, Screen.List)
 

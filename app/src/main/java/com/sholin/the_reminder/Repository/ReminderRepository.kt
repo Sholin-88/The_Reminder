@@ -21,7 +21,6 @@ class ReminderRepository(
 
     suspend fun insertReminder(reminder: Reminder): Long {
         val id = dao.insertUser(reminder)
-        syncToFirebase(reminder.copy(id = id.toInt()))
         return id
     }
 

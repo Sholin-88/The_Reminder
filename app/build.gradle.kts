@@ -40,6 +40,7 @@ android {
     }
     buildFeatures {
         compose = true
+        aidl =true
     }
 }
 
@@ -58,6 +59,8 @@ dependencies {
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.paging)
     testImplementation("androidx.room:room-testing:${libs.versions.room.get()}")
+
+    implementation("androidx.work:work-runtime:2.12.0")
 
     implementation(libs.media3.exoplayer)
     implementation(libs.media3.ui)

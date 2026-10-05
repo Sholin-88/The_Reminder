@@ -15,6 +15,4 @@ data class Reminder(
     @ColumnInfo(name = "alarm") val alarm: Boolean? = false,
     @ColumnInfo(name = "repeatDays") val repeatDays: String? = null,
     @ColumnInfo(name = "repeatTime") val repeatTime: String? = null
-) {
-    constructor() : this(0, "", "", "", false, null, null)
-}
+)
